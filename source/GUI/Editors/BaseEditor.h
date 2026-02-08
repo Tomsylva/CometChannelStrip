@@ -47,6 +47,11 @@ namespace viator::gui::editors
 
         void setBackgroundColor(const juce::Colour colour) { m_comp_bg = colour; repaint(); };
 
+        static void drawVerticalText(juce::Graphics& g,
+                      const juce::String& text,
+                      juce::Rectangle<float> area,
+                      juce::Justification just = juce::Justification::centred);
+
     private:
         dsp::processors::BaseProcessor &processorRef;
         std::vector<widgets::BaseSlider *> m_sliders;
@@ -76,5 +81,8 @@ namespace viator::gui::editors
         std::array<LevelMeter, kNumSliders> m_input_meters, m_output_meters;
 
         void timerCallback() override;
+
+        juce::Image m_noise;
+        static juce::Image makeNoiseImage(int w, int h, float amount = 0.02f);
     };
 }

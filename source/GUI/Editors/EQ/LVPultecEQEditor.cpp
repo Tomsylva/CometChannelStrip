@@ -56,6 +56,17 @@ namespace viator::gui::editors
         m_main_sliders[kHighFreq].setLookAndFeel(&m_rect_dial_laf);
         m_main_sliders[kHighAttenSel].setLookAndFeel(&m_rect_dial_laf);
 
+        m_tube_button.setButtonText("Tube");
+        m_tube_button.setClickingTogglesState(true);
+        m_tube_button.setColour(juce::ComboBox::ColourIds::outlineColourId,
+                         juce::Colours::transparentBlack);
+        m_tube_button.setColour(juce::TextButton::ColourIds::buttonColourId, gui_utils::Colors::main_bg());
+        m_tube_button.setColour(juce::TextButton::ColourIds::buttonOnColourId, gui_utils::Colors::light_bg().withAlpha(0.5f));
+        m_tube_button.setColour(juce::TextButton::ColourIds::textColourOffId, gui_utils::Colors::text());
+        m_tube_button.setColour(juce::TextButton::ColourIds::textColourOnId, gui_utils::Colors::text());
+        m_tube_button.setLookAndFeel(&m_button_laf);
+        addAndMakeVisible(m_tube_button);
+
         setSize(1000, 600);
     }
 
@@ -70,12 +81,13 @@ namespace viator::gui::editors
     //==============================================================================
     void LVPultecEQEditor::paint(juce::Graphics &g)
     {
+        setBackgroundColor(juce::Colour(47, 57, 70));
         BaseEditor::paint(g);
     }
 
     void LVPultecEQEditor::resized()
     {
-        const auto width = juce::roundToInt(getWidth() * 0.34);
+        auto width = juce::roundToInt(getWidth() * 0.34);
         auto x = juce::roundToInt(getWidth() * 0.05);
         auto y = getHeight() - juce::roundToInt(width * 1.5);
 
@@ -85,13 +97,23 @@ namespace viator::gui::editors
             y -= width;
         }
 
-        y = getHeight() - juce::roundToInt(width * 1.5);
+        y = juce::roundToInt(getHeight() * 0.62);
         x = getWidth() - x - width;
-        for (int i = 4; i < 8; ++i)
-        {
-            m_main_sliders[i].setBounds(x, y, width, width);
-            y -= width;
-        }
+        m_main_sliders[kLowFreq].setBounds(x, y, width, width);
+        x = juce::roundToInt(getWidth() * 0.41);
+        y = juce::roundToInt(getHeight() * 0.45);
+        width = juce::roundToInt(width * 0.7);
+        m_main_sliders[kBandwidth].setBounds(x, y, width, width);
+        y = juce::roundToInt(getHeight() * 0.25);
+        width = m_main_sliders[kLowFreq].getWidth();
+        m_main_sliders[kHighFreq].setBounds(m_main_sliders[kLowFreq].getX(), y, width, width);
+        x = juce::roundToInt(getWidth() * 0.405);
+        y = juce::roundToInt(getHeight() * 0.11);
+        width = juce::roundToInt(width * 0.7);
+        m_main_sliders[kHighAttenSel].setBounds(x, y, width, width);
+
+        //width = juce::roundToInt(getWidth() * 0.25);
+        //m_tube_button.setBounds(getLocalBounds().withSizeKeepingCentre(width, width / 2));
 
         BaseEditor::resized();
     }

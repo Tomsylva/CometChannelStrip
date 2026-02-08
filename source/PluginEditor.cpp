@@ -114,7 +114,7 @@ void AudioPluginAudioProcessorEditor::resized()
 
     // Macro Dials
     auto compX = juce::roundToInt(getWidth() * 0.1);
-    const auto compY = juce::roundToInt(getHeight() * 0.84);
+    const auto compY = juce::roundToInt(getHeight() * 0.848);
     const auto compWidth = juce::roundToInt(getWidth() * 0.05);
     const auto compHeight = juce::roundToInt(compWidth * 1.089);
     padding = juce::roundToInt(getWidth() * 0.033);

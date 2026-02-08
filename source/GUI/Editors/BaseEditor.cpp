@@ -16,10 +16,11 @@ namespace viator::gui::editors
         auto shadow = juce::DropShadow(shadow_color, 10, {0, 4});
 
         //m_drop_shadow = std::make_unique<juce::DropShadower>(shadow);
-       // m_drop_shadow->setOwner(this);
+        // m_drop_shadow->setOwner(this);
 
         // SLIDERS
-        for (auto &slider: m_io_sliders) {
+        for (auto &slider: m_io_sliders)
+        {
             setSliderProps(slider);
         }
 
@@ -57,17 +58,17 @@ namespace viator::gui::editors
         };
 
         m_mute_attach = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(processorRef
-            .getTreeState(), "muteID" +
-                             juce::String(
-                                 processorRef.getProcessorID()),
-            m_buttons[kMute]);
+                                                                                               .getTreeState(), "muteID" +
+                                                                                                   juce::String(
+                                                                                                       processorRef.getProcessorID()),
+                                                                                               m_buttons[kMute]);
 
-        for (auto& meter : m_input_meters)
+        for (auto &meter: m_input_meters)
         {
             addAndMakeVisible(meter);
         }
 
-        for (auto& meter : m_output_meters)
+        for (auto &meter: m_output_meters)
         {
             addAndMakeVisible(meter);
         }
@@ -89,7 +90,8 @@ namespace viator::gui::editors
         m_preset_browser.setLookAndFeel(nullptr);
         m_oversampling_menu.setLookAndFeel(nullptr);
 
-        for (auto &button: m_buttons) {
+        for (auto &button: m_buttons)
+        {
             button.setLookAndFeel(nullptr);
         }
     }
@@ -98,37 +100,45 @@ namespace viator::gui::editors
     void BaseEditor::paint(juce::Graphics &g)
     {
         const auto bounds = getLocalBounds();
+        constexpr auto contrast = 0.2f;
+        const auto center = static_cast<float>(bounds.getCentreX());
+        auto y = static_cast<float>(bounds.getY());
+        const auto bottom = static_cast<float>(bounds.getBottom());
 
-        // juce::ColourGradient faceGrad(
-        //     gui_utils::Colors::medium_bg().brighter(0.05f),
-        //     bounds.getX() + bounds.getWidth() * 0.25f, bounds.getY() + bounds.getHeight() * 0.20f,
-        //     gui_utils::Colors::medium_bg().darker(0.05f),
-        //     bounds.getRight() - bounds.getWidth() * 0.15f, bounds.getBottom() - bounds.getHeight() * 0.10f,
-        //     true
-        // );
-        //
-        // g.setGradientFill(faceGrad);
-        g.setColour(juce::Colour(44, 49, 60));
+        const juce::ColourGradient faceGrad(
+            m_comp_bg.brighter(contrast),
+            center, y,
+            m_comp_bg.darker(contrast),
+            center, bottom,
+            false
+        );
+
+        g.setGradientFill(faceGrad);
         g.fillRect(bounds);
 
+        g.drawImageAt(m_noise, 0, 0);
+
         constexpr auto padding = 1;
+        const auto header_bottom = juce::roundToInt(getHeight() * 0.05) + 12;
+        const auto footer_top = juce::roundToInt(getHeight() * 0.91);
 
-        //g.setColour(gui_utils::Colors::header_bg());
-        g.fillRect(padding, 0, getWidth() - padding, juce::roundToInt(getHeight() * 0.05) + 12);
-        g.fillRect(padding, juce::roundToInt(getHeight() * 0.91), getWidth() - padding, juce::roundToInt(getHeight() * 0.09));
+        g.setColour(gui_utils::Colors::main_bg());
+        g.fillRect(padding, 0, getWidth() - padding, header_bottom);
+        g.fillRect(padding, footer_top, getWidth() - padding, juce::roundToInt(getHeight() * 0.09));
 
-        g.setColour(gui_utils::Colors::light_bg());
+        g.setColour(gui_utils::Colors::medium_bg());
         g.drawRect(0, 0, getWidth(), getHeight(), padding);
-
-        auto y = static_cast<float>(getHeight()) * 0.05f + 12.0f;
+        y = static_cast<float>(getHeight()) * 0.05f + 12.0f;
         g.drawLine(padding, y, static_cast<float>(getWidth()) - padding, y, padding);
-
         y = static_cast<float>(getHeight()) * 0.91f;
         g.drawLine(padding, y, static_cast<float>(getWidth()) - padding, y, padding);
     }
 
     void BaseEditor::resized()
     {
+        if (getWidth() > 0 && getHeight() > 0)
+            m_noise = makeNoiseImage(getWidth(), getHeight(), 0.02f);
+
         // SLIDERS
         auto width = juce::roundToInt(getHeight() * 0.1);
         auto height = width;
@@ -166,7 +176,8 @@ namespace viator::gui::editors
         m_oversampling_menu.setBounds(x, y, width, height);
         width = juce::roundToInt(width * 0.5);
         x = m_oversampling_menu.getRight() + padding;
-        for (auto &button: m_buttons) {
+        for (auto &button: m_buttons)
+        {
             button.setBounds(x, y, width, height);
             x += width + padding;
         }
@@ -215,5 +226,45 @@ namespace viator::gui::editors
         m_input_meters[1].setLevel(in.second);
         m_output_meters[0].setLevel(out.first);
         m_output_meters[1].setLevel(out.second);
+    }
+
+    void BaseEditor::drawVerticalText(juce::Graphics &g,
+                                      const juce::String &text,
+                                      const juce::Rectangle<float> area,
+                                      const juce::Justification just)
+    {
+        g.saveState();
+
+        // Rotate around the area centre
+        const auto c = area.getCentre();
+        g.addTransform(juce::AffineTransform::rotation(-juce::MathConstants<float>::halfPi, c.x, c.y));
+
+        // After rotation, drawText still uses the same area rect (now rotated in world space)
+        g.drawText(text, area.toNearestInt(), just, true);
+
+        g.restoreState();
+    }
+
+    juce::Image BaseEditor::makeNoiseImage(const int w, const int h, const float amount)
+    {
+        juce::Image img(juce::Image::ARGB, w, h, true);
+        juce::Random rng;
+
+        for (int y = 0; y < h; ++y)
+            for (int x = 0; x < w; ++x)
+            {
+                const float n = (rng.nextFloat() * 2.0f - 1.0f); // -1..1
+                const float v = 0.5f + 0.5f * n;                // 0..1
+
+                // tiny brightness variation around neutral grey
+                const auto c = static_cast<juce::uint8>(juce::jlimit(0, 255, static_cast<int>(std::round(v * 255.0f))));
+
+                // amount controls opacity of the grain
+                const auto a = static_cast<juce::uint8>(juce::jlimit(0, 255, static_cast<int>(std::round(amount * 255.0f))));
+
+                img.setPixelAt(x, y, juce::Colour::fromRGBA(c, c, c, a));
+            }
+
+        return img;
     }
 }
