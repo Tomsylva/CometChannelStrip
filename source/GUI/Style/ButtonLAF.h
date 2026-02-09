@@ -4,11 +4,11 @@
 
 #pragma once
 #include <juce_gui_basics/juce_gui_basics.h>
+#include "Images.h"
 
 namespace viator::laf
 {
-    class ButtonLAF : public juce::LookAndFeel_V4
-    {
+    class ButtonLAF : public juce::LookAndFeel_V4 {
     public:
         void drawButtonBackground(juce::Graphics &g,
                                   juce::Button &button,
@@ -52,6 +52,85 @@ namespace viator::laf
 
             g.setColour(textCol);
             g.drawFittedText(button.getButtonText(), r, juce::Justification::centred, 1);
+        }
+
+        juce::Font getTextButtonFont(juce::TextButton & /*button*/, const int buttonHeight) override
+        {
+            return {juce::FontOptions(static_cast<float>(buttonHeight) * 0.45f, juce::Font::bold)};
+        }
+    };
+
+    class InsetToggleLAF final : public juce::LookAndFeel_V4 {
+    public:
+        void drawButtonBackground(juce::Graphics &g,
+                                  juce::Button &button,
+                                  const juce::Colour &,
+                                  bool isOver,
+                                  bool isDown) override
+        {
+            const auto r = button.getLocalBounds().toFloat().reduced(3.0f);
+            constexpr float corner = 2.0f;
+            const bool isOn = button.getToggleState();
+            const auto base = button.findColour(juce::TextButton::buttonColourId);
+
+            g.setColour(isOn ? base.darker(0.25f).withAlpha(0.5f) : base.withAlpha(0.5f));
+            g.fillRoundedRectangle(r, corner);
+
+            g.setColour(juce::Colours::black.withAlpha(0.25f));
+            g.drawRoundedRectangle(r, corner, 1.0f);
+
+            // light bevel just under the top outline
+            {
+                g.saveState();
+
+                constexpr float bevelH = 1.0f;
+                g.reduceClipRegion(r.withHeight(bevelH).toNearestInt());
+
+                g.setColour(isOn ? juce::Colours::black.withAlpha(0.25f) : juce::Colours::white.withAlpha(0.18f));
+                g.drawRoundedRectangle(r.translated(0.0f, 1.0f), corner, 1.0f);
+
+                g.restoreState();
+            }
+
+            // bottom bevel BELOW the outline (outside)
+            {
+                g.saveState();
+
+                constexpr float bevelH = 1.0f;
+                constexpr float yOffset = 0.0f;
+
+                const auto band = juce::Rectangle<float>(r.getX(),
+                                                   r.getBottom() + yOffset,
+                                                   r.getWidth(),
+                                                   bevelH);
+
+                g.reduceClipRegion(band.toNearestInt());
+
+                g.setColour(juce::Colours::white.withAlpha(0.14f)); // tweak
+                g.drawRoundedRectangle(r.translated(0.0f, yOffset), corner, 1.0f);
+
+                g.restoreState();
+            }
+
+            gui::Images::tube_icon()->replaceColour(juce::Colours::black, juce::Colours::whitesmoke);
+            if (isOn)
+            {
+                gui::Images::tube_icon()->replaceColour(juce::Colours::whitesmoke, juce::Colour(128, 195, 255));
+            } else
+            {
+                gui::Images::tube_icon()->replaceColour(juce::Colour(128, 195, 255), juce::Colours::whitesmoke);
+            }
+
+            const auto image_size = button.getHeight() * 0.5;
+            gui::Images::tube_icon()->drawWithin(g, r.withSizeKeepingCentre(image_size / 2, image_size),
+                juce::RectanglePlacement::stretchToFit, 1.0f);
+        }
+
+        void drawButtonText(juce::Graphics &g,
+                    juce::TextButton &button,
+                    bool /*isMouseOverButton*/,
+                    bool /*isButtonDown*/) override
+        {
         }
 
         juce::Font getTextButtonFont(juce::TextButton & /*button*/, const int buttonHeight) override

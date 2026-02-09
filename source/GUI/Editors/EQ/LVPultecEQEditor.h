@@ -41,10 +41,13 @@ namespace viator::gui::editors
         void setLabelProps(juce::Label &label);
 
         juce::TextButton m_tube_button;
-        viator::laf::ButtonLAF m_button_laf;
+        std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> m_tube_attach;
+        viator::laf::InsetToggleLAF m_button_laf;
 
         viator::laf::DialLAF m_dial_laf;
         viator::laf::PultecHandleDialLAF m_rect_dial_laf;
         viator::gui::laf::MenuLAF m_menu_laf;
+
+        const juce::Colour m_bg_color {47, 57, 70};
     };
 }

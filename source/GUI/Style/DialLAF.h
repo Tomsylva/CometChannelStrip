@@ -284,17 +284,20 @@ namespace viator::laf
             const float faceRadius = trackRadius - trackThickness * 0.95f;
             const auto faceBounds = juce::Rectangle<float>(faceRadius * 1.0f, faceRadius * 1.0f).withCentre(centre);
 
-            auto faceBase = slider.findColour(juce::Slider::ColourIds::rotarySliderOutlineColourId);
+            auto faceBase = slider.findColour(juce::Slider::ColourIds::backgroundColourId);
             juce::ColourGradient faceGrad(
-                faceBase.brighter(0.15f),
+                faceBase.brighter(0.2f),
                 faceBounds.getX() + faceBounds.getWidth() * 0.25f, faceBounds.getY() + faceBounds.getHeight() * 0.20f,
-                faceBase.darker(0.15f),
+                faceBase.darker(0.2f),
                 faceBounds.getRight() - faceBounds.getWidth() * 0.15f, faceBounds.getBottom() - faceBounds.getHeight() * 0.10f,
                 true
             );
 
             g.setGradientFill(faceGrad);
             g.fillEllipse(faceBounds);
+
+            g.setColour(juce::Colours::black.withAlpha(0.25f));
+            g.drawEllipse(faceBounds, 1.0f);
 
             // Define the dimensions and position of the rounded rectangle
             float rectWidth = static_cast<float>(width) * 0.15f; // 10% of the component's width
@@ -314,18 +317,18 @@ namespace viator::laf
             dialRect.applyTransform(transform);
 
             // Draw the rounded rectangle
-            faceBase = slider.findColour(juce::Slider::ColourIds::rotarySliderOutlineColourId);
+            faceBase = slider.findColour(juce::Slider::ColourIds::backgroundColourId);
             juce::ColourGradient grad(
-                faceBase.brighter(0.05f),
+                faceBase.brighter(0.1f),
                 faceBounds.getX() + faceBounds.getWidth() * 0.25f, faceBounds.getY() + faceBounds.getHeight() * 0.20f,
-                faceBase.darker(0.05f),
+                faceBase.darker(0.1f),
                 faceBounds.getRight() - faceBounds.getWidth() * 0.15f, faceBounds.getBottom() - faceBounds.getHeight() * 0.10f,
                 true
             );
             g.setGradientFill(grad);
             g.fillPath(dialRect);
 
-            g.setColour(slider.findColour(juce::Slider::ColourIds::backgroundColourId));
+            g.setColour(juce::Colours::black.withAlpha(0.25f));
             g.strokePath(dialRect, juce::PathStrokeType(1.0f, juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
 
             {

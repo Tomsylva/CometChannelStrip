@@ -12,11 +12,15 @@ namespace viator::gui
 {
     class Images final {
     public:
-        Images() = default;
+        Images()
+        {
+            m_tube_icon = juce::Drawable::createFromImageData(BinaryData::tube2_svg,
+                                                 BinaryData::tube2_svgSize);
+        }
 
         static const juce::Image &logo() { return images().m_logo; }
-        static const juce::Image &texture() { return images().m_texture; }
-        static const juce::Image &bd_d() { return images().m_bd_d; }
+
+        static const std::unique_ptr<juce::Drawable> &tube_icon() { return images().m_tube_icon; }
 
     private:
         static Images &images()
@@ -30,14 +34,8 @@ namespace viator::gui
             juce::ImageCache::getFromMemory(BinaryData::landon_png,
                                             BinaryData::landon_pngSize)
         };
-        juce::Image m_texture{
-            juce::ImageCache::getFromMemory(BinaryData::lightgrayconcretewall_jpg,
-                                            BinaryData::lightgrayconcretewall_jpgSize)
-        };
-        juce::Image m_bd_d{
-            juce::ImageCache::getFromMemory(BinaryData::back_d_png,
-                                            BinaryData::back_d_pngSize)
-        };
+
+        std::unique_ptr<juce::Drawable> m_tube_icon;
 
         JUCE_DECLARE_NON_COPYABLE(Images)
     };

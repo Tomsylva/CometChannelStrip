@@ -4,7 +4,7 @@
 
 #pragma once
 #include <juce_dsp/juce_dsp.h>
-#include "../../modules/ParametricEQ.h"
+#include "../../modules/Triode.h"
 
 namespace LVPultecEQParameters
 {
@@ -125,12 +125,35 @@ namespace viator::dsp
             {
                 filter.prepare(spec);
             }
+
+            for (auto &tube: m_tubes)
+            {
+                tube.prepare(spec);
+            }
+
+            setTriodeParams(m_tubes[0], 10.0f, 0.0f, 17000.0f, 8.0f);
+            setTriodeParams(m_tubes[1], 10.0f, 0.0f,  17000.0f, 32.0f);
+            setTriodeParams(m_tubes[2], 10.0f, 0.0f,  17000.0f, 40.0f);
+
+            m_tubes[0].setInput(-18.0f);
+            m_tubes[0].setOutput(-6.0f);
+            m_tubes[1].setOutput(-3.0f);
+            m_tubes[2].setOutput(27.0f);
         }
 
         void process(juce::AudioBuffer<float> &buffer, const int num_samples)
         {
             juce::dsp::AudioBlock<float> block(buffer);
             const auto up_sampled_block = m_oversampler->processSamplesUp(block);
+
+            if (m_tube_on)
+            {
+                for (auto &tube: m_tubes)
+                {
+                    tube.process(up_sampled_block);
+                }
+            }
+
             m_oversampler->processSamplesDown(block);
 
             for (auto& filter: m_filters)
@@ -149,6 +172,8 @@ namespace viator::dsp
             const auto high_atten = parameters.highAttenParam->get();
             const auto high_atten_select = parameters.highAttenSelParam->get();
             const auto bandwidth = parameters.bandwidthParam->get();
+            m_tube_on = parameters.tubeButtonParam->get();
+
 
             *m_filters[kLowBoost].state = *juce::dsp::IIR::Coefficients<float>::makeLowShelf(
                 m_sample_rate, low_freq * 2.0f, bandwidth, juce::Decibels::decibelsToGain(low_boost));
@@ -168,6 +193,22 @@ namespace viator::dsp
         std::unique_ptr<juce::dsp::Oversampling<float> > m_oversampler;
         using Filter = juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float> >;
         std::array<Filter, num_filters> m_filters;
+        std::array<Triode, 3> m_tubes;
         float m_sample_rate{44100.0f};
+        bool m_tube_on{false};
+
+        static inline void setTriodeParams(Triode& triode,
+                    const float low_shelf_hz,
+                    const float low_shelf_gain,
+                    const float miller_cap_hz,
+                    const float dc_filter_hz)
+        {
+            Triode::TriodeParameters params;
+            params.low_shelf_hz = low_shelf_hz;
+            params.low_shelf_gain = low_shelf_gain;
+            params.miller_cap_hz = miller_cap_hz;
+            params.dc_filter_hz = dc_filter_hz;
+            triode.setTriodeParameters(params);
+        }
     };
 }

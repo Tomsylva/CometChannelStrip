@@ -76,6 +76,11 @@ namespace viator::dsp::processors
             LVPultecEQParameters::muteName + juce::String(id),
             false));
 
+        params.push_back(std::make_unique<juce::AudioParameterBool>(
+            juce::ParameterID{LVPultecEQParameters::tubeButtonID + juce::String(id), 1},
+            LVPultecEQParameters::tubeButtonName + juce::String(id),
+            false));
+
         return {params.begin(), params.end()};
     }
 
