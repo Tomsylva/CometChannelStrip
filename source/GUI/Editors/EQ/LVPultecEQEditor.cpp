@@ -27,9 +27,9 @@ namespace viator::gui::editors
         for (int i = 0; i < num_sliders; ++i)
         {
             LVPultecEQEditor::setSliderProps(m_main_sliders[i]);
-            getSliders().push_back(&m_main_sliders[i]);
-            m_main_sliders[i].setComponentID(ids[i]);
+            m_main_sliders[i].setComponentID(ids[i] + id);
             m_main_sliders[i].setName(names[i]);
+            getSliders().push_back(&m_main_sliders[i]);
 
             main_slider_attaches.emplace_back(
                 std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.getTreeState(), ids[i] + id, m_main_sliders[i]));

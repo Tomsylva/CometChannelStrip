@@ -19,6 +19,9 @@ namespace viator::gui::views
 
         m_plugin_selector.setTextWhenNothingSelected("Add Plugin Module");
         buildPopupMenu();
+        m_plugin_selector.setColour(juce::ComboBox::ColourIds::backgroundColourId, juce::Colours::black.withAlpha(0.5f));
+        m_plugin_selector.setColour(juce::ComboBox::ColourIds::outlineColourId, juce::Colours::black.withAlpha(0.5f));
+        m_plugin_selector.setLookAndFeel(&m_selector_laf);
         addAndMakeVisible(m_plugin_selector);
 
         m_plugin_selector.onChange = [this]()
@@ -50,6 +53,8 @@ namespace viator::gui::views
                 base->removeActionListener(this);
             }
         }
+
+        m_plugin_selector.setLookAndFeel(nullptr);
     }
 
     void EditorRack::paint(juce::Graphics &g)
@@ -73,10 +78,9 @@ namespace viator::gui::views
 
         const auto is_empty = m_editors.empty();
         const auto box_width = juce::roundToInt(getWidth() * 0.2);
-        const auto box_height = juce::roundToInt(getHeight() * 0.1);
         const auto box_x = is_empty ? 0
                                     : m_editors[m_editors.size() - 1]->getRight();
-        m_plugin_selector.setBounds(getLocalBounds().withSizeKeepingCentre(box_width, box_height).withX(box_x));
+        m_plugin_selector.setBounds(getLocalBounds().withX(box_x).withWidth(box_width));
     }
 
     void EditorRack::addEditor()

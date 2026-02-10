@@ -7,6 +7,7 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include "../Editors/BaseEditor.h"
 #include "../../DSP/Processors/ProcessorUtils.h"
+#include "../Style/SelectorLAF.h"
 
 class AudioPluginAudioProcessor;
 
@@ -59,5 +60,7 @@ namespace viator::gui::views
         void remove_editor_at_index(const int index);
 
         std::unique_ptr<juce::DropShadower> m_drop_shadow;
+
+        viator::laf::SelectorLAF m_selector_laf;
     };
 }
