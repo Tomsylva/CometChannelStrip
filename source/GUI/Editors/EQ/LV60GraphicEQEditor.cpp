@@ -77,8 +77,9 @@ namespace viator::gui::editors
         const auto text = "LV60 Graphic EQ";
         constexpr auto x = 2;
         const auto y = juce::roundToInt(getHeight() * 0.84);
+        const auto font_size = static_cast<float>(getHeight()) * 0.027f;
         g.setColour(gui_utils::Colors::graphic_slider_blue());
-        g.setFont(gui_utils::Fonts::bold(12.0f));
+        g.setFont(gui_utils::Fonts::bold(font_size));
         g.drawFittedText(text, x, y, getWidth() / 2, getHeight() / 10, juce::Justification::centredLeft, {});
     }
 

@@ -26,7 +26,6 @@ namespace viator::dsp::processors
         std::vector<std::unique_ptr<juce::RangedAudioParameter> > params;
 
         juce::NormalisableRange<float> range(20.0f, 20000.0f, 1.0f);
-        range.setSkewForCentre(1000.0f);
 
         params.push_back(std::make_unique<juce::AudioParameterFloat>(
             juce::ParameterID{LVPultecEQParameters::lowBoostID + juce::String(id), 1},
@@ -37,19 +36,26 @@ namespace viator::dsp::processors
             LVPultecEQParameters::lowAttenName + juce::String(id),
             0.0f, 17.5f, 0.0f));
 
+        range = juce::NormalisableRange<float>(5000.0f, 20000.0f, 1.0f);
+        range.setSkewForCentre(10000.0f);
         params.push_back(std::make_unique<juce::AudioParameterFloat>(
             juce::ParameterID{LVPultecEQParameters::highAttenSelID + juce::String(id), 1},
             LVPultecEQParameters::highAttenSelName + juce::String(id),
-            5000.0f, 20000.0f, 20000.0f));
+            range, 20000.0f));
 
+        range = juce::NormalisableRange<float>(20.0f, 100.0f, 1.0f);
+        range.setSkewForCentre(50.0f);
         params.push_back(std::make_unique<juce::AudioParameterFloat>(
             juce::ParameterID{LVPultecEQParameters::lowFreqID + juce::String(id), 1},
             LVPultecEQParameters::lowFreqName + juce::String(id),
-            20.0f, 100.0f, 20.0f));
+            range, 50.0f));
+
+        range = juce::NormalisableRange<float>(3000.0f, 16000.0f, 1.0f);
+        range.setSkewForCentre(8000.0f);
         params.push_back(std::make_unique<juce::AudioParameterFloat>(
             juce::ParameterID{LVPultecEQParameters::highFreqID + juce::String(id), 1},
             LVPultecEQParameters::highFreqName + juce::String(id),
-            3000.0f, 16000.0f, 3000.0f));
+            range, 8000.0f));
 
         params.push_back(std::make_unique<juce::AudioParameterFloat>(
             juce::ParameterID{LVPultecEQParameters::highBoostID + juce::String(id), 1},
@@ -81,6 +87,8 @@ namespace viator::dsp::processors
             LVPultecEQParameters::tubeButtonName + juce::String(id),
             false));
 
+        range = juce::NormalisableRange<float>(20.0f, 20000.0f, 1.0f);
+        range.setSkewForCentre(1000.0f);
         params.push_back(std::make_unique<juce::AudioParameterFloat>(
             juce::ParameterID{LVPultecEQParameters::hpCutoffID + juce::String(id), 1},
             LVPultecEQParameters::hpCutoffName + juce::String(id),
@@ -96,6 +104,19 @@ namespace viator::dsp::processors
             LVPultecEQParameters::driveName + juce::String(id),
             0.0f,
             10.0f,
+            0.0f));
+
+        params.push_back(std::make_unique<juce::AudioParameterFloat>(
+            juce::ParameterID{LVPultecEQParameters::inputGainID + juce::String(id), 1},
+            LVPultecEQParameters::inputGainName + juce::String(id),
+            -30.0f,
+            30.0f,
+            0.0f));
+        params.push_back(std::make_unique<juce::AudioParameterFloat>(
+            juce::ParameterID{LVPultecEQParameters::outputGainID + juce::String(id), 1},
+            LVPultecEQParameters::outputGainName + juce::String(id),
+            -30.0f,
+            30.0f,
             0.0f));
 
         return {params.begin(), params.end()};
@@ -249,6 +270,7 @@ namespace viator::dsp::processors
             m_dry_buffer.copyFrom(channel, 0, buffer, channel, 0, buffer.getNumSamples());
         }
 
+        buffer.applyGain(juce::Decibels::decibelsToGain(m_parameters->inputParam->get()));
         calculateInputPeakLevel(buffer);
 
         const auto oversampling_choice = m_parameters->oversamplingParam->getIndex();
@@ -272,6 +294,7 @@ namespace viator::dsp::processors
             }
         }
 
+        buffer.applyGain(juce::Decibels::decibelsToGain(m_parameters->outputParam->get()));
         calculateOutputPeakLevel(buffer);
     }
 

@@ -14,6 +14,11 @@ namespace LVPultecEQParameters
     inline const juce::String muteID = "muteID";
     inline const juce::String muteName = "Mute";
 
+    inline const juce::String inputGainID = "inputGainID";
+    inline const juce::String inputGainName = "Input";
+    inline const juce::String outputGainID = "outputGainID";
+    inline const juce::String outputGainName = "Output";
+
     inline const juce::String lowBoostID = "lowBoostID";
     inline const juce::String lowBoostName = "Low Boost";
 
@@ -62,6 +67,11 @@ namespace LVPultecEQParameters
 
             muteParam = dynamic_cast<juce::AudioParameterBool *>(state.getParameter(
                 muteID + juce::String(id)));
+
+            inputParam = dynamic_cast<juce::AudioParameterFloat *>(state.getParameter(
+                inputGainID + juce::String(id)));
+            outputParam = dynamic_cast<juce::AudioParameterFloat *>(state.getParameter(
+                outputGainID + juce::String(id)));
 
             lowBoostParam = dynamic_cast<juce::AudioParameterFloat *>(state.getParameter(
                 lowBoostID + juce::String(id)));
@@ -113,6 +123,9 @@ namespace LVPultecEQParameters
         juce::AudioParameterFloat *hpCutoffParam{nullptr};
         juce::AudioParameterFloat *lpCutoffParam{nullptr};
         juce::AudioParameterFloat *driveParam{nullptr};
+
+        juce::AudioParameterFloat *inputParam{nullptr};
+        juce::AudioParameterFloat *outputParam{nullptr};
     };
 }
 
@@ -150,32 +163,25 @@ namespace viator::dsp
                 filter.prepare(spec);
             }
 
+
             for (auto &tube: m_tubes) {
                 tube.prepare(spec);
             }
 
-            setTriodeParams(m_tubes[0], 10.0f, 0.0f, 17000.0f, 8.0f);
-            setTriodeParams(m_tubes[1], 10.0f, 0.0f, 17000.0f, 32.0f);
-            setTriodeParams(m_tubes[2], 10.0f, 0.0f, 17000.0f, 40.0f);
-
-            m_tubes[0].setInput(-18.0f);
-            m_tubes[0].setOutput(-6.0f);
-            m_tubes[1].setOutput(-3.0f);
-            m_tubes[2].setOutput(27.0f);
+            setTriodeParams(m_tubes[0], 100.0f, 0.5f, 17000.0f, 5.0f);
+            setTriodeParams(m_tubes[1], 100.0f, 0.5f, 17000.0f, 5.0f);
+            setTriodeParams(m_tubes[2], 100.0f, 0.5f, 17000.0f, 5.0f);
         }
 
         void process(juce::AudioBuffer<float> &buffer, const int num_samples)
         {
             juce::dsp::AudioBlock<float> block(buffer);
+
             const auto up_sampled_block = m_oversampler->processSamplesUp(block);
 
-            // if (m_tube_on)
-            // {
-            //     for (auto &tube: m_tubes)
-            //     {
-            //         tube.process(up_sampled_block);
-            //     }
-            // }
+            for (auto &tube: m_tubes) {
+                tube.process(up_sampled_block);
+            }
 
             m_oversampler->processSamplesDown(block);
 
@@ -194,7 +200,12 @@ namespace viator::dsp
             const auto high_atten = parameters.highAttenParam->get();
             const auto high_atten_select = parameters.highAttenSelParam->get();
             const auto bandwidth = parameters.bandwidthParam->get();
-            m_tube_on = parameters.tubeButtonParam->get();
+            const auto drive = parameters.driveParam->get();
+
+            for (int i = 0; i < m_tubes.size(); ++i) {
+                m_tubes[i].setMix(drive * 10.0f);
+                m_tubes[i].setInput(drive / (static_cast<float>(i) + 1.0f));
+            }
 
             *m_filters[kLowBoost].state = *juce::dsp::IIR::Coefficients<float>::makeLowShelf(
                 m_sample_rate, low_freq * 2.0f, bandwidth, juce::Decibels::decibelsToGain(low_boost));
@@ -219,7 +230,6 @@ namespace viator::dsp
         std::array<Filter, num_filters> m_filters;
         std::array<Triode, 3> m_tubes;
         float m_sample_rate{44100.0f};
-        bool m_tube_on{false};
 
         static inline void setTriodeParams(Triode &triode,
                                            const float low_shelf_hz,

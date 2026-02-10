@@ -112,20 +112,13 @@ namespace viator::laf
             auto centre = b.getCentre();
             auto r = juce::jmin(b.getWidth(), b.getHeight()) * 0.5f;
 
-            auto normalise = [&](const float v) -> float
+            auto angleFromProportion = [&](float p) -> float
             {
-                const auto minV = static_cast<float>(slider.getRange().getStart());
-                const auto maxV = static_cast<float>(slider.getRange().getEnd());
-                const auto denom = (maxV - minV);
-                if (denom == 0.0f) return 0.0f;
-                return juce::jlimit(0.0f, 1.0f, (v - minV) / denom);
+                p = juce::jlimit(0.0f, 1.0f, p);
+                return rotaryStartAngle + p * (rotaryEndAngle - rotaryStartAngle);
             };
 
-            auto angleForValue = [&](const float v) -> float
-            {
-                const float t = normalise(v);
-                return rotaryStartAngle + t * (rotaryEndAngle - rotaryStartAngle);
-            };
+            const float valueAngle = angleFromProportion(sliderPos);
 
             const juce::Colour defaultTrack = juce::Colours::black.brighter(0.1f);
             constexpr auto trackId = juce::Slider::trackColourId;
@@ -135,8 +128,6 @@ namespace viator::laf
             const float faceRadius = trackRadius - trackThickness * 0.95f;
             const auto faceBounds = juce::Rectangle<float>(faceRadius * 2.0f, faceRadius * 2.0f).withCentre(centre);
 
-            const auto v = static_cast<float>(slider.getValue());
-            const float valueAngle = angleForValue(v);
             const float rimW = faceRadius * 0.075f;
             auto outline = faceBounds.reduced(rimW * 0.15f); {
                 const auto shadowBase = juce::Colours::black;
@@ -299,20 +290,13 @@ namespace viator::laf
             auto centre = b.getCentre();
             auto r = juce::jmin(b.getWidth(), b.getHeight()) * 0.5f;
 
-            auto normalise = [&](const float v) -> float
+            auto angleFromProportion = [&](float p) -> float
             {
-                const auto minV = static_cast<float>(slider.getRange().getStart());
-                const auto maxV = static_cast<float>(slider.getRange().getEnd());
-                const auto denom = (maxV - minV);
-                if (denom == 0.0f) return 0.0f;
-                return juce::jlimit(0.0f, 1.0f, (v - minV) / denom);
+                p = juce::jlimit(0.0f, 1.0f, p);
+                return rotaryStartAngle + p * (rotaryEndAngle - rotaryStartAngle);
             };
 
-            auto angleForValue = [&](const float v) -> float
-            {
-                const float t = normalise(v);
-                return rotaryStartAngle + t * (rotaryEndAngle - rotaryStartAngle);
-            };
+            const float valueAngle = angleFromProportion(sliderPos);
 
             const juce::Colour defaultTrack = juce::Colours::black.brighter(0.1f);
             constexpr auto trackId = juce::Slider::trackColourId;
@@ -346,11 +330,7 @@ namespace viator::laf
             juce::Path dialRect;
             dialRect.addRoundedRectangle(-rectWidth / 2, -rectHeight / 2, rectWidth, rectHeight, rectRadius);
 
-            const auto toAngle = rotaryStartAngle + sliderPos * (rotaryEndAngle - rotaryStartAngle);
-
-            // Apply rotation based on the dial value
-            float angle = toAngle; // Use the calculated angle
-            juce::AffineTransform transform = juce::AffineTransform::rotation(angle)
+            juce::AffineTransform transform = juce::AffineTransform::rotation(valueAngle)
                     .translated(centre.getX(), centre.getY());
             dialRect.applyTransform(transform);
 
@@ -367,9 +347,8 @@ namespace viator::laf
             g.fillPath(dialRect);
 
             g.setColour(juce::Colours::black.withAlpha(0.25f));
-            g.strokePath(dialRect, juce::PathStrokeType(1.0f, juce::PathStrokeType::curved, juce::PathStrokeType::rounded)); {
-                const auto v = static_cast<float>(slider.getValue());
-                const float valueAngle = angleForValue(v);
+            g.strokePath(dialRect, juce::PathStrokeType(1.0f, juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
+            {
                 const float dotAngle = valueAngle - juce::MathConstants<float>::halfPi;
                 const float dotDist = faceRadius * 0.62f;
                 const float dotR = faceRadius * 0.07f;

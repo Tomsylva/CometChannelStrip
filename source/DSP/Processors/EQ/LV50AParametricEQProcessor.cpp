@@ -57,8 +57,7 @@ namespace viator::dsp::processors
             LV50AParametricEQParameters::muteName + juce::String(id),
             false));
 
-        for (int i = 0; i < LV50AParametricEQParameters::numBands; ++i)
-        {
+        for (int i = 0; i < LV50AParametricEQParameters::numBands; ++i) {
             params.push_back(std::make_unique<juce::AudioParameterFloat>(
                 juce::ParameterID{LV50AParametricEQParameters::gainIDs[static_cast<size_t>(i)] + juce::String(id), 1},
                 "Gain " + juce::String(i + 1) + juce::String(id),
@@ -69,11 +68,25 @@ namespace viator::dsp::processors
                 "Q " + juce::String(i + 1) + juce::String(id),
                 0.01f, 0.95f, 0.3f));
 
+
             params.push_back(std::make_unique<juce::AudioParameterFloat>(
                 juce::ParameterID{LV50AParametricEQParameters::cutoffIDs[static_cast<size_t>(i)] + juce::String(id), 1},
                 "Cutoff " + juce::String(i + 1) + juce::String(id),
                 range, 1000.0f));
         }
+
+        params.push_back(std::make_unique<juce::AudioParameterFloat>(
+            juce::ParameterID{LV50AParametricEQParameters::inputGainID + juce::String(id), 1},
+            LV50AParametricEQParameters::inputGainName + juce::String(id),
+            -30.0f,
+            30.0f,
+            0.0f));
+        params.push_back(std::make_unique<juce::AudioParameterFloat>(
+            juce::ParameterID{LV50AParametricEQParameters::outputGainID + juce::String(id), 1},
+            LV50AParametricEQParameters::outputGainName + juce::String(id),
+            -30.0f,
+            30.0f,
+            0.0f));
 
         return {params.begin(), params.end()};
     }
@@ -150,33 +163,27 @@ namespace viator::dsp::processors
     void LV50AParametricEQProcessor::updateParameters()
     {
         const auto oversampling_choice = m_parameters->oversamplingParam->getIndex();
-        if (oversampling_choice >= 0 && static_cast<size_t>(oversampling_choice) < m_process_blocks.size())
-        {
+        if (oversampling_choice >= 0 && static_cast<size_t>(oversampling_choice) < m_process_blocks.size()) {
             m_process_blocks[static_cast<size_t>(oversampling_choice)].updateParameters(*m_parameters);
         }
 
         const auto should_mute = m_parameters->muteParam->get();
 
-        for (auto &mute: m_mutes)
-        {
-            mute.setTargetValue(!static_cast<float>(should_mute));
+        for (auto &mute: m_mutes) {
+            mute.setTargetValue(!should_mute);
         }
     }
 
     //==============================================================================
     void LV50AParametricEQProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
     {
-        // Use this method as the place to do any pre-playback
-        // initialisation that you need..
         juce::ignoreUnused(sampleRate, samplesPerBlock);
 
-        for (auto &mute: m_mutes)
-        {
+        for (auto &mute: m_mutes) {
             mute.reset(sampleRate, 0.02);
         }
 
-        for (int i = 0; i < m_process_blocks.size(); ++i)
-        {
+        for (int i = 0; i < m_process_blocks.size(); ++i) {
             m_process_blocks[i].prepare(sampleRate, samplesPerBlock, getTotalNumInputChannels(), i);
         }
 
@@ -216,32 +223,28 @@ namespace viator::dsp::processors
     void LV50AParametricEQProcessor::processBlock(juce::AudioBuffer<float> &buffer,
                                                   juce::MidiBuffer &midiMessages)
     {
-        juce::ignoreUnused(midiMessages);
+        ignoreUnused(midiMessages);
 
         updateParameters();
 
         m_dry_buffer.clear();
-        for (int channel = 0; channel < buffer.getNumChannels(); ++channel)
-        {
+        for (int channel = 0; channel < buffer.getNumChannels(); ++channel) {
             m_dry_buffer.copyFrom(channel, 0, buffer, channel, 0, buffer.getNumSamples());
         }
 
+        buffer.applyGain(juce::Decibels::decibelsToGain(m_parameters->inputParam->get()));
         calculateInputPeakLevel(buffer);
 
         const auto oversampling_choice = m_parameters->oversamplingParam->getIndex();
-        if (oversampling_choice >= 0 && static_cast<size_t>(oversampling_choice) < m_process_blocks.size())
-        {
+        if (oversampling_choice >= 0 && static_cast<size_t>(oversampling_choice) < m_process_blocks.size()) {
             m_process_blocks[static_cast<size_t>(oversampling_choice)].process(buffer, buffer.getNumSamples());
         }
 
-
-        for (int channel = 0; channel < buffer.getNumChannels(); ++channel)
-        {
+        for (int channel = 0; channel < buffer.getNumChannels(); ++channel) {
             auto *data = buffer.getWritePointer(channel);
             const auto *dry_data = m_dry_buffer.getWritePointer(channel);
 
-            for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
-            {
+            for (int sample = 0; sample < buffer.getNumSamples(); ++sample) {
                 const auto dry_sample = dry_data[sample];
                 const auto wet_sample = data[sample];
                 const auto mix = m_mutes[channel].getNextValue();
@@ -249,6 +252,7 @@ namespace viator::dsp::processors
             }
         }
 
+        buffer.applyGain(juce::Decibels::decibelsToGain(m_parameters->outputParam->get()));
         calculateOutputPeakLevel(buffer);
     }
 

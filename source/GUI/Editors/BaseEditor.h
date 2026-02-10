@@ -55,6 +55,7 @@ namespace viator::gui::editors
     private:
         dsp::processors::BaseProcessor &processorRef;
         std::vector<widgets::BaseSlider *> m_sliders;
+        std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> m_in_attach, m_out_attach;
 
         std::array<juce::Slider, 2> m_io_sliders;
         viator::laf::MacroLAF m_io_laf {1};

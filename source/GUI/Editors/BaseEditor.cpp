@@ -18,13 +18,28 @@ namespace viator::gui::editors
         m_drop_shadow->setOwner(this);
 
         // SLIDERS
-        for (auto &slider: m_io_sliders)
-        {
+        for (auto &slider: m_io_sliders) {
             BaseEditor::setSliderProps(slider);
         }
 
         m_io_sliders[kInput].setName("In");
         m_io_sliders[kOutput].setName("Out");
+
+        m_in_attach = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
+            processorRef
+            .getTreeState(),
+            "inputGainID" +
+            juce::String(
+                processorRef.getProcessorID()),
+            m_io_sliders[kInput]);
+
+        m_out_attach = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
+            processorRef
+            .getTreeState(),
+            "outputGainID" +
+            juce::String(
+                processorRef.getProcessorID()),
+            m_io_sliders[kOutput]);
 
         // MENUS
         juce::StringArray items = {"Presets"};
@@ -57,18 +72,16 @@ namespace viator::gui::editors
         };
 
         m_mute_attach = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(processorRef
-                                                                                               .getTreeState(), "muteID" +
-                                                                                                   juce::String(
-                                                                                                       processorRef.getProcessorID()),
-                                                                                               m_buttons[kMute]);
+            .getTreeState(), "muteID" +
+                             juce::String(
+                                 processorRef.getProcessorID()),
+            m_buttons[kMute]);
 
-        for (auto &meter: m_input_meters)
-        {
+        for (auto &meter: m_input_meters) {
             addAndMakeVisible(meter);
         }
 
-        for (auto &meter: m_output_meters)
-        {
+        for (auto &meter: m_output_meters) {
             addAndMakeVisible(meter);
         }
 
@@ -89,8 +102,7 @@ namespace viator::gui::editors
         m_preset_browser.setLookAndFeel(nullptr);
         m_oversampling_menu.setLookAndFeel(nullptr);
 
-        for (auto &button: m_buttons)
-        {
+        for (auto &button: m_buttons) {
             button.setLookAndFeel(nullptr);
         }
     }
@@ -175,8 +187,7 @@ namespace viator::gui::editors
         m_oversampling_menu.setBounds(x, y, width, height);
         width = juce::roundToInt(width * 0.5);
         x = m_oversampling_menu.getRight() + padding;
-        for (auto &button: m_buttons)
-        {
+        for (auto &button: m_buttons) {
             button.setBounds(x, y, width, height);
             x += width + padding;
         }
@@ -250,8 +261,7 @@ namespace viator::gui::editors
         juce::Random rng;
 
         for (int y = 0; y < h; ++y)
-            for (int x = 0; x < w; ++x)
-            {
+            for (int x = 0; x < w; ++x) {
                 const float n = (rng.nextFloat() * 2.0f - 1.0f); // -1..1
                 const float v = 0.5f + 0.5f * n; // 0..1
 

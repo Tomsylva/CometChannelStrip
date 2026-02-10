@@ -36,9 +36,12 @@ namespace viator::dsp
             initSmoother(m_drive_smoothers, sample_rate);
             initSmoother(m_input_smoothers, sample_rate);
             initSmoother(m_output_smoothers, sample_rate);
+            initSmoother(m_mix_smoothers, sample_rate);
+
             setSmoother(m_drive_smoothers, 10.0f);
             setSmoother(m_input_smoothers, 0.0f);
             setSmoother(m_output_smoothers, 0.0f);
+            setSmoother(m_mix_smoothers, 0.0f);
 
             initFilter(m_dc_filters, spec, Filter::FilterType::kHighPass);
             initFilter(m_ls_filters, spec, Filter::FilterType::kLowShelf);
@@ -71,26 +74,30 @@ namespace viator::dsp
                 for (size_t sample = 0; sample < block.getNumSamples(); ++sample) {
                     const auto ch = static_cast<int>(channel);
                     const float drive = m_drive_smoothers[ch].getNextValue();
+                    const float mix = m_mix_smoothers[ch].getNextValue();
                     const float input = m_input_smoothers[ch].getNextValue();
                     const float output = m_output_smoothers[ch].getNextValue();
-                    float xn = data[sample] * input;
+                    const float xn = data[sample];
+                    const auto compensation = 1.0f / (mix + 1.0f);
 
                     float low = 0.0f;
                     float high = 0.0f;
 
                     m_band_filters[ch].processSample(ch, xn, low, high);
 
-                    high = valveGridConduction(high, m_parameters.grid_thresh);
-                    high = classAValve(high, drive, m_parameters.grid_thresh,
+                    auto signal = high * input;
+
+                    signal = valveGridConduction(signal, m_parameters.grid_thresh);
+                    signal = classAValve(signal, drive, m_parameters.grid_thresh,
                                                   m_parameters.clip_point_positive,
                                                   m_parameters.clip_point_negative);
-                    xn = low + high;
-                    xn = m_dc_filters[channel].processSample(xn, static_cast<int>(channel));
 
-                    xn = m_ls_filters[channel].processSample(xn, static_cast<int>(channel));
-                    xn = m_lp_filters[channel].processSample(xn, static_cast<int>(channel));
+                    signal = m_lp_filters[channel].processSample(signal, static_cast<int>(channel));
+                    signal = m_ls_filters[channel].processSample(signal, static_cast<int>(channel));
+                    auto blend = (1.0f - mix) * (low + high) + (low + signal * compensation) * output * mix;
+                    blend = m_dc_filters[channel].processSample(blend, static_cast<int>(channel));
 
-                    data[sample] = xn * output;
+                    data[sample] = blend;
                 }
             }
         }
@@ -99,9 +106,7 @@ namespace viator::dsp
         {
             constexpr auto min_drive = 0.0f;
             constexpr auto max_drive = 10.0f;
-
             const auto safe_drive = juce::jlimit(min_drive, max_drive, drive);
-
             setSmoother(m_drive_smoothers, safe_drive);
         }
 
@@ -109,9 +114,7 @@ namespace viator::dsp
         {
             constexpr auto min_gain = -20.0f;
             constexpr auto max_gain = 20.0f;
-
             const auto safe_input = juce::jlimit(min_gain, max_gain, input);
-
             setSmoother(m_input_smoothers, safe_input);
         }
 
@@ -119,10 +122,16 @@ namespace viator::dsp
         {
             constexpr auto min_gain = -20.0f;
             constexpr auto max_gain = 20.0f;
-
             const auto safe_output = juce::jlimit(min_gain, max_gain, output);
-
             setSmoother(m_output_smoothers, safe_output);
+        }
+
+        void setMix(const float mix)
+        {
+            const auto safe_mix = juce::jlimit(0.0f, 100.0f, mix);
+            for (auto& smoother : m_mix_smoothers) {
+                smoother.setTargetValue(safe_mix * 0.01f);
+            }
         }
 
         void setTriodeParameters(const TriodeParameters &parameters)
@@ -134,7 +143,7 @@ namespace viator::dsp
         }
 
     private:
-        std::array<juce::SmoothedValue<float>, 2> m_drive_smoothers, m_input_smoothers, m_output_smoothers;
+        std::array<juce::SmoothedValue<float>, 2> m_drive_smoothers, m_input_smoothers, m_output_smoothers, m_mix_smoothers;
         TriodeParameters m_parameters;
         std::array<Filter, 2> m_dc_filters, m_ls_filters, m_lp_filters;
         std::array<juce::dsp::LinkwitzRileyFilter<float>, 2> m_band_filters;
@@ -143,6 +152,7 @@ namespace viator::dsp
         {
             for (auto &s: smoother) {
                 s.reset(sample_rate, 0.02);
+                s.setCurrentAndTargetValue(0.0f);
             }
         }
 

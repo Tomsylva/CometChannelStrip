@@ -8,19 +8,24 @@
 
 namespace LV60GraphicEQParameters
 {
-    inline const juce::String oversamplingChoiceID   = "oversamplingChoiceID";
+    inline const juce::String oversamplingChoiceID = "oversamplingChoiceID";
     inline const juce::String oversamplingChoiceName = "oversamplingChoiceName";
 
-    inline const juce::String muteID   = "muteID";
+    inline const juce::String muteID = "muteID";
     inline const juce::String muteName = "Mute";
 
-    inline const juce::String hpCutoffID   = "hpCutoffID";
+    inline const juce::String inputGainID = "inputGainID";
+    inline const juce::String inputGainName = "Input";
+    inline const juce::String outputGainID = "outputGainID";
+    inline const juce::String outputGainName = "Output";
+
+    inline const juce::String hpCutoffID = "hpCutoffID";
     inline const juce::String hpCutoffName = "HP Hz";
 
-    inline const juce::String lpCutoffID   = "lpCutoffID";
+    inline const juce::String lpCutoffID = "lpCutoffID";
     inline const juce::String lpCutoffName = "LP Hz";
 
-    inline const juce::String driveID   = "driveID";
+    inline const juce::String driveID = "driveID";
     inline const juce::String driveName = "Drive";
 
     constexpr int numBands = 10;
@@ -32,48 +37,58 @@ namespace LV60GraphicEQParameters
 
     struct parameters
     {
-        explicit parameters(const juce::AudioProcessorValueTreeState& state, const int id)
+        explicit parameters(const juce::AudioProcessorValueTreeState &state, const int id)
         {
-            oversamplingParam = dynamic_cast<juce::AudioParameterChoice*>(state.getParameter(
+            oversamplingParam = dynamic_cast<juce::AudioParameterChoice *>(state.getParameter(
                 oversamplingChoiceID + juce::String(id)));
 
-            hpCutoffParam = dynamic_cast<juce::AudioParameterFloat*>(state.getParameter(
+            inputParam = dynamic_cast<juce::AudioParameterFloat *>(state.getParameter(
+                inputGainID + juce::String(id)));
+            outputParam = dynamic_cast<juce::AudioParameterFloat *>(state.getParameter(
+                outputGainID + juce::String(id)));
+
+            hpCutoffParam = dynamic_cast<juce::AudioParameterFloat *>(state.getParameter(
                 hpCutoffID + juce::String(id)));
 
-            lpCutoffParam = dynamic_cast<juce::AudioParameterFloat*>(state.getParameter(
+            lpCutoffParam = dynamic_cast<juce::AudioParameterFloat *>(state.getParameter(
                 lpCutoffID + juce::String(id)));
 
-            driveParam = dynamic_cast<juce::AudioParameterFloat*>(state.getParameter(
+            driveParam = dynamic_cast<juce::AudioParameterFloat *>(state.getParameter(
                 driveID + juce::String(id)));
 
-            muteParam = dynamic_cast<juce::AudioParameterBool*>(state.getParameter(
+            muteParam = dynamic_cast<juce::AudioParameterBool *>(state.getParameter(
                 muteID + juce::String(id)));
 
             for (int i = 0; i < numBands; ++i)
-                gainParams[i] = dynamic_cast<juce::AudioParameterFloat*>(state.getParameter(
+                gainParams[i] = dynamic_cast<juce::AudioParameterFloat *>(state.getParameter(
                     gainIDs[static_cast<size_t>(i)] + juce::String(id)));
         }
 
-        juce::AudioParameterChoice* oversamplingParam{ nullptr };
-        juce::AudioParameterFloat*  hpCutoffParam{ nullptr };
-        juce::AudioParameterFloat*  lpCutoffParam{ nullptr };
-        juce::AudioParameterFloat*  driveParam{ nullptr };
-        juce::AudioParameterBool*   muteParam{ nullptr };
+        juce::AudioParameterChoice *oversamplingParam{nullptr};
+        juce::AudioParameterFloat *hpCutoffParam{nullptr};
+        juce::AudioParameterFloat *lpCutoffParam{nullptr};
+        juce::AudioParameterFloat *driveParam{nullptr};
+        juce::AudioParameterBool *muteParam{nullptr};
 
-        std::array<juce::AudioParameterFloat*, numBands> gainParams{};
+        juce::AudioParameterFloat *inputParam{nullptr};
+        juce::AudioParameterFloat *outputParam{nullptr};
+
+        std::array<juce::AudioParameterFloat *, numBands> gainParams{};
     };
 }
 
 namespace viator::dsp
 {
-    class LV60GraphicEQProcessBlock {
+    class LV60GraphicEQProcessBlock
+    {
     public:
         LV60GraphicEQProcessBlock() = default;
 
         ~LV60GraphicEQProcessBlock() = default;
 
         enum { kNumBands = LV60GraphicEQParameters::numBands };
-        enum {kHP = 0, kLP, kNum_filters };
+
+        enum { kHP = 0, kLP, kNum_filters };
 
         void prepare(const double sample_rate, const int samples_per_block, const int num_channels, int factor)
         {
@@ -89,15 +104,13 @@ namespace viator::dsp
                                                                               true);
             m_oversampler->initProcessing(spec.maximumBlockSize);
 
-            for (auto &drive: m_drive_smoothers)
-            {
+            for (auto &drive: m_drive_smoothers) {
                 drive.reset(spec.sampleRate <= 0 ? 44100.0f : spec.sampleRate, 0.02);
             }
 
             m_graphic_eq.prepare(spec);
 
-            for (auto& filter: m_filters)
-            {
+            for (auto &filter: m_filters) {
                 filter.prepare(spec);
             }
 
@@ -107,7 +120,6 @@ namespace viator::dsp
 
         void process(juce::AudioBuffer<float> &buffer, const int num_samples)
         {
-
             juce::dsp::AudioBlock<float> block(buffer);
 
             const auto up_sampled_block = m_oversampler->processSamplesUp(block);
@@ -115,18 +127,15 @@ namespace viator::dsp
             m_oversampler->processSamplesDown(block);
 
             m_graphic_eq.processBlock(block, num_samples);
-            for (auto& filter: m_filters)
-            {
+            for (auto &filter: m_filters) {
                 filter.process(juce::dsp::ProcessContextReplacing<float>(block));
             }
         }
 
         void updateParameters(LV60GraphicEQParameters::parameters &parameters)
         {
-            for (auto &drive: m_drive_smoothers)
-            {
-                if (parameters.driveParam)
-                {
+            for (auto &drive: m_drive_smoothers) {
+                if (parameters.driveParam) {
                     const auto raw_drive = parameters.driveParam->get();
                     const auto safe_drive = juce::jlimit(0.0f, 10.0f, raw_drive);
                     const auto db_drive = safe_drive * 0.1f;
@@ -144,6 +153,7 @@ namespace viator::dsp
 
             const auto hp_cutoff = parameters.hpCutoffParam->get();
             const auto lp_cutoff = parameters.lpCutoffParam->get();
+
             m_filters[kHP].setCutoffFrequency(hp_cutoff);
             m_filters[kLP].setCutoffFrequency(lp_cutoff);
         }
@@ -155,7 +165,7 @@ namespace viator::dsp
         static constexpr float two_pi = 2.0f * juce::MathConstants<float>::pi;
         viator::dsp::GraphicEq<float> m_graphic_eq;
 
-        void processSaturation(const juce::dsp::AudioBlock<float>& block, const int num_samples)
+        void processSaturation(const juce::dsp::AudioBlock<float> &block, const int num_samples)
         {
             for (size_t channel = 0; channel < block.getNumChannels(); ++channel) {
                 auto *data = block.getChannelPointer(channel);

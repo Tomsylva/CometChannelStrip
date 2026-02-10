@@ -15,14 +15,14 @@ namespace viator::gui::editors
         const juce::StringArray ids = {
             LVPultecEQParameters::lowBoostID, LVPultecEQParameters::lowAttenID, LVPultecEQParameters::highBoostID, LVPultecEQParameters::highAttenID,
             LVPultecEQParameters::lowFreqID, LVPultecEQParameters::bandwidthID, LVPultecEQParameters::highFreqID, LVPultecEQParameters::highAttenSelID,
-            LVPultecEQParameters::hpCutoffID, LVPultecEQParameters::driveID, LVPultecEQParameters::lpCutoffID
+            LVPultecEQParameters::driveID, LVPultecEQParameters::lpCutoffID, LVPultecEQParameters::hpCutoffID
         };
 
         const juce::StringArray names = {
             LVPultecEQParameters::lowBoostName, LVPultecEQParameters::lowAttenName, LVPultecEQParameters::highBoostName,
             LVPultecEQParameters::highAttenName, LVPultecEQParameters::lowFreqName, LVPultecEQParameters::bandwidthName,
             LVPultecEQParameters::highFreqName, LVPultecEQParameters::highAttenSelName,
-            LVPultecEQParameters::hpCutoffName, LVPultecEQParameters::driveName, LVPultecEQParameters::lpCutoffName
+            LVPultecEQParameters::driveName, LVPultecEQParameters::lpCutoffName, LVPultecEQParameters::hpCutoffName
         };
 
         for (int i = 0; i < num_sliders; ++i)
@@ -84,8 +84,9 @@ namespace viator::gui::editors
         const auto text = "Program Tube \nEqualizer";
         const auto x = juce::roundToInt(getWidth() * 0.58);
         const auto y = juce::roundToInt(getHeight() * 0.325);
+        const auto font_size = static_cast<float>(getHeight()) * 0.027f;
         g.setColour(juce::Colour(120, 185, 181));
-        g.setFont(gui_utils::Fonts::bold(12.0f));
+        g.setFont(gui_utils::Fonts::bold(font_size));
         g.drawFittedText(text, x, y, getWidth() / 2, getHeight() / 10, juce::Justification::centred, 2);
     }
 

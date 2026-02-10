@@ -112,9 +112,10 @@ namespace viator::gui::editors
         const auto text = "LV50 Parametric EQ";
         constexpr auto x = 0;
         const auto y = juce::roundToInt(getHeight() * 0.045);
-        g.setColour(juce::Colour(247, 55, 79));
-        g.setFont(gui_utils::Fonts::bold(12.0f));
-        g.drawFittedText(text, x, y, getWidth() / 2, getHeight() / 10, juce::Justification::centred, {});
+        const auto font_size = static_cast<float>(getHeight()) * 0.027f;
+        g.setColour(juce::Colour(120, 185, 181));
+        g.setFont(gui_utils::Fonts::bold(font_size));
+        g.drawFittedText(text, x, y, getWidth(), getHeight() / 10, juce::Justification::centred, {});
     }
 
     void LV50AParametricEQEditor::resized()
@@ -127,9 +128,9 @@ namespace viator::gui::editors
         {
             y = juce::roundToInt(getHeight() * 0.12);
             m_main_sliders[i].setBounds(x, y, width, width);
-            y += width + width / 2;
+            y += width + width / 3;
             m_main_sliders[i + 8].setBounds(x, y, width, width);
-            y += width + width / 4;
+            y += width + width / 3;
             m_main_sliders[i + 4].setBounds(x, y, width, width);
             x += width;
         }
