@@ -82,15 +82,12 @@ namespace viator::gui::editors
         }
         m_main_sliders[kHP].setComponentID(LV50AParametricEQParameters::hpCutoffID + id);
         m_main_sliders[kHP].setName("HP");
-        m_main_sliders[kHP].setComponentID(LV50AParametricEQParameters::hpCutoffID + id);
 
         m_main_sliders[kLP].setComponentID(LV50AParametricEQParameters::lpCutoffID + id);
         m_main_sliders[kLP].setName("LP");
-        m_main_sliders[kLP].setComponentID(LV50AParametricEQParameters::lpCutoffID + id);
 
         m_main_sliders[kDrive].setComponentID(LV50AParametricEQParameters::driveID + id);
         m_main_sliders[kDrive].setName("Drive");
-        m_main_sliders[kDrive].setComponentID(LV50AParametricEQParameters::driveID + id);
 
 
         updateLabels();
@@ -111,6 +108,13 @@ namespace viator::gui::editors
     {
         setBackgroundColor(juce::Colour(57, 62, 70));
         BaseEditor::paint(g);
+
+        const auto text = "LV50 Parametric EQ";
+        constexpr auto x = 0;
+        const auto y = juce::roundToInt(getHeight() * 0.045);
+        g.setColour(juce::Colour(247, 55, 79));
+        g.setFont(gui_utils::Fonts::bold(12.0f));
+        g.drawFittedText(text, x, y, getWidth() / 2, getHeight() / 10, juce::Justification::centred, {});
     }
 
     void LV50AParametricEQEditor::resized()

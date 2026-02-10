@@ -16,21 +16,12 @@ namespace viator::gui::editors
         {
             setSliderProps(m_main_sliders[i]);
             getSliders().push_back(&m_main_sliders[i]);
-
-            m_main_sliders[i].onValueChange = [this, i]()
-            {
-                const auto value = m_main_sliders[i].getValue();
-                const auto text = value >= 1000.0 ? juce::String(value / 1000.0f, 2) + " kHz" : juce::String(value, 2);
-                m_main_labels[i].setText(text, juce::dontSendNotification);
-            };
         }
+
+        m_main_sliders[kGain1].setLookAndFeel(&m_slider_laf_no_top);
+        m_main_sliders[kGain10].setLookAndFeel(&m_slider_laf_no_bottom);
 
         m_main_sliders[kGain5].setColour(juce::Slider::ColourIds::thumbColourId, juce::Colour(220, 60, 40));
-
-        for (auto& label : m_main_labels)
-        {
-            setLabelProps(label);
-        }
 
         for (int i = 0; i < m_gain_labels.size(); i++)
         {
@@ -58,13 +49,9 @@ namespace viator::gui::editors
         m_main_sliders[kHP].setComponentID(LV60GraphicEQParameters::hpCutoffID + id);
         m_main_sliders[kLP].setComponentID(LV60GraphicEQParameters::lpCutoffID + id);
         m_main_sliders[kDrive].setComponentID(LV60GraphicEQParameters::driveID + id);
-
-        for (int i = 0; i < m_main_sliders.size(); ++i)
-        {
-            const auto value = m_main_sliders[i].getValue();
-            const auto text = value >= 1000.0 ? juce::String(value / 1000.0f, 2) + " kHz" : juce::String(value, 2);
-            m_main_labels[i].setText(text, juce::dontSendNotification);
-        }
+        m_main_sliders[kHP].setName("HP");
+        m_main_sliders[kLP].setName("LP");
+        m_main_sliders[kDrive].setName("Drive");
 
         setSize(1000, 600);
     }
@@ -82,54 +69,40 @@ namespace viator::gui::editors
     {
         setBackgroundColor(juce::Colour(34, 40, 49));
         BaseEditor::paint(g);
+
+        const auto text = "LV60 Graphic EQ";
+        constexpr auto x = 2;
+        const auto y = juce::roundToInt(getHeight() * 0.84);
+        g.setColour(gui_utils::Colors::graphic_slider_blue());
+        g.setFont(gui_utils::Fonts::bold(12.0f));
+        g.drawFittedText(text, x, y, getWidth() / 2, getHeight() / 10, juce::Justification::centredLeft, {});
     }
 
     void LV60GraphicEQEditor::resized()
     {
-        auto x = juce::roundToInt(getWidth() * 0.2);
         auto y = juce::roundToInt(getHeight() * 0.07);
         auto width = juce::roundToInt(getWidth() * 0.6);
-        const auto height = getHeight() / (num_sliders + 2);
-        auto font_size = static_cast<float>(getWidth()) * 0.05f;
+        const auto label_width = juce::roundToInt(getWidth() * 0.3);
+        const auto height = juce::roundToInt(getHeight() * 0.063);
+        const auto font_size = static_cast<float>(getWidth()) * 0.05f;
 
-        for (auto& slider : m_main_sliders)
+        for (int i = 0; i < m_gain_labels.size(); ++i)
         {
-            slider.setBounds(x, y, width, height);
+            m_gain_labels[i].setBounds(0, y, label_width, height);
+            m_gain_labels[i].setFont(viator::gui_utils::Fonts::regular(font_size));
+            m_main_sliders[i].setBounds(m_gain_labels[i].getRight(), y, width, height);
             y += height;
         }
 
-        for (int i = 0; i < m_main_sliders.size(); ++i)
-        {
-            const auto _x = m_main_sliders[i].getRight();
-            const auto _y = m_main_sliders[i].getY();
-            const auto _width = getWidth() - m_main_sliders[i].getRight();
-            m_main_labels[i].setBounds(_x, _y, _width, height);
-            m_main_labels[i].setFont(viator::gui_utils::Fonts::regular(font_size));
-
-            if (i > m_gain_labels.size() - 1)
-                continue;
-
-            m_gain_labels[i].setBounds(0, _y, _width, height);
-            m_gain_labels[i].setFont(viator::gui_utils::Fonts::regular(font_size));
-        }
-
-        width = getWidth() / 5;
-        y = juce::roundToInt(getHeight() * 0.75);
-        x = juce::roundToInt(getWidth() * 0.198);
-        const auto label_height = height / 2;
+        width = juce::roundToInt(getWidth() * 0.335);
+        y = juce::roundToInt(getHeight() * 0.7);
+        auto x = 0;
         const auto filter_size = juce::roundToInt(width * 0.85);
-        font_size = static_cast<float>(getWidth()) * 0.035f;
         m_main_sliders[kHP].setBounds(x, y, filter_size, filter_size);
-        m_main_labels[kHP].setBounds(x, m_main_sliders[kHP].getBottom(), width, label_height);
-        m_main_labels[kHP].setFont(viator::gui_utils::Fonts::regular(font_size));
         x += width;
         m_main_sliders[kDrive].setBounds(x, y, width, width);
-        m_main_labels[kDrive].setBounds(x, m_main_sliders[kDrive].getBottom(), width, label_height);
-        m_main_labels[kDrive].setFont(viator::gui_utils::Fonts::regular(font_size));
         x += width + (width - filter_size);
         m_main_sliders[kLP].setBounds(x, y, filter_size, filter_size);
-        m_main_labels[kLP].setBounds(x, m_main_sliders[kLP].getBottom(), width, label_height);
-        m_main_labels[kLP].setFont(viator::gui_utils::Fonts::regular(font_size));
 
         BaseEditor::resized();
     }
@@ -149,6 +122,7 @@ namespace viator::gui::editors
             slider.setLookAndFeel(&m_slider_laf);
         } else
         {
+            slider.setColour(juce::Slider::ColourIds::backgroundColourId, juce::Colour(157, 178, 191));
             slider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
             slider.setColour(juce::Slider::ColourIds::rotarySliderOutlineColourId, juce::Colour(215, 215, 215).withAlpha(0.85f));
             slider.setColour(juce::Slider::ColourIds::thumbColourId, juce::Colour(5, 120, 190));

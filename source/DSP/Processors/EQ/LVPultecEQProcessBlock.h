@@ -146,13 +146,13 @@ namespace viator::dsp
             juce::dsp::AudioBlock<float> block(buffer);
             const auto up_sampled_block = m_oversampler->processSamplesUp(block);
 
-            if (m_tube_on)
-            {
-                for (auto &tube: m_tubes)
-                {
-                    tube.process(up_sampled_block);
-                }
-            }
+            // if (m_tube_on)
+            // {
+            //     for (auto &tube: m_tubes)
+            //     {
+            //         tube.process(up_sampled_block);
+            //     }
+            // }
 
             m_oversampler->processSamplesDown(block);
 
@@ -173,7 +173,6 @@ namespace viator::dsp
             const auto high_atten_select = parameters.highAttenSelParam->get();
             const auto bandwidth = parameters.bandwidthParam->get();
             m_tube_on = parameters.tubeButtonParam->get();
-
 
             *m_filters[kLowBoost].state = *juce::dsp::IIR::Coefficients<float>::makeLowShelf(
                 m_sample_rate, low_freq * 2.0f, bandwidth, juce::Decibels::decibelsToGain(low_boost));

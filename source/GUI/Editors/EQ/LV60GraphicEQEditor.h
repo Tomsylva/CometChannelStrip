@@ -10,13 +10,37 @@
 
 class SliderLAF : public juce::LookAndFeel_V4 {
 public:
+    SliderLAF(bool draw_top, bool draw_bottom)
+    {
+        m_draw_top_line = draw_top;
+        m_draw_bottom_line = draw_bottom;
+    }
     void drawLinearSlider(juce::Graphics &g, int x, int y, int width, int height,
                                           float sliderPos,
                                           float minSliderPos,
                                           float maxSliderPos,
                                           const juce::Slider::SliderStyle style, juce::Slider &slider) override
     {
-        auto isTwoVal = (style == juce::Slider::SliderStyle::TwoValueVertical || style == juce::Slider::SliderStyle::TwoValueHorizontal);
+        auto line_x = static_cast<float>(slider.getLocalBounds().getWidth()) * 0.1f;
+        const auto _height = static_cast<float>(slider.getLocalBounds().getHeight());
+        const auto line_height = m_draw_bottom_line ? _height : _height / 2;
+        const auto _y = m_draw_top_line ? 0 : _height / 2;
+
+        g.setColour(viator::gui_utils::Colors::graphic_slider_blue());
+        g.drawLine(line_x, _y, line_x, line_height, 2.0f);
+
+        line_x = static_cast<float>(slider.getLocalBounds().getWidth()) * 0.3f;
+        g.drawLine(line_x, _y, line_x, line_height, 2.0f);
+
+        line_x = static_cast<float>(slider.getLocalBounds().getWidth()) * 0.5f;
+        g.drawLine(line_x, _y, line_x, line_height, 2.0f);
+
+        line_x = static_cast<float>(slider.getLocalBounds().getWidth()) * 0.7f;
+        g.drawLine(line_x, _y, line_x, line_height, 2.0f);
+
+        line_x = static_cast<float>(slider.getLocalBounds().getWidth()) * 0.9f;
+        g.drawLine(line_x, _y, line_x, line_height, 2.0f);
+
         auto isThreeVal = (style == juce::Slider::SliderStyle::ThreeValueVertical || style == juce::Slider::SliderStyle::ThreeValueHorizontal);
 
         auto trackWidth = juce::jmin(6.0f, slider.isHorizontal() ? (float) height * 0.25f : (float) width * 0.25f);
@@ -53,6 +77,10 @@ public:
         g.setColour(slider.findColour(juce::Slider::thumbColourId));
         g.fillRoundedRectangle (juce::Rectangle<float> (static_cast<float> (thumbWidth), static_cast<float> (thumbWidth) / 2.0f).withCentre (maxPoint), 6.0f);
     }
+
+private:
+    bool m_draw_top_line {true};
+    bool m_draw_bottom_line {true};
 };
 
 namespace viator::gui::editors
@@ -80,7 +108,6 @@ namespace viator::gui::editors
         void setComboBoxProps(juce::ComboBox &box, const juce::StringArray &items);
 
         std::array<viator::gui::widgets::BaseSlider, Sliders::num_sliders> m_main_sliders;
-        std::array<juce::Label, Sliders::num_sliders> m_main_labels;
         std::array<juce::Label, 10> m_gain_labels;
         std::vector<std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> > main_slider_attaches;
         std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> m_hp_attach, m_lp_attach, m_drive_attach;
@@ -98,6 +125,8 @@ namespace viator::gui::editors
 
         viator::laf::DialLAF m_dial_laf;
         viator::gui::laf::MenuLAF m_menu_laf;
-        SliderLAF m_slider_laf;
+        SliderLAF m_slider_laf {true, true};
+        SliderLAF m_slider_laf_no_top {false, true};
+        SliderLAF m_slider_laf_no_bottom {true, false};
     };
 }

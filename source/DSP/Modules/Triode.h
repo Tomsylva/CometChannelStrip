@@ -56,6 +56,14 @@ namespace viator::dsp
             }
         }
 
+        void reset()
+        {
+            for (auto& filter : m_band_filters)
+            {
+                filter.reset();
+            }
+        }
+
         void process(const juce::dsp::AudioBlock<float> &block)
         {
             for (size_t channel = 0; channel < block.getNumChannels(); ++channel) {

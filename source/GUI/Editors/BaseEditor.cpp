@@ -3,7 +3,6 @@
 //
 
 #include "BaseEditor.h"
-#include "GUI/Style/Images.h"
 
 namespace viator::gui::editors
 {
@@ -15,13 +14,13 @@ namespace viator::gui::editors
         const auto shadow_color = juce::Colours::black;
         auto shadow = juce::DropShadow(shadow_color, 10, {0, 4});
 
-        //m_drop_shadow = std::make_unique<juce::DropShadower>(shadow);
-        // m_drop_shadow->setOwner(this);
+        m_drop_shadow = std::make_unique<juce::DropShadower>(shadow);
+        m_drop_shadow->setOwner(this);
 
         // SLIDERS
         for (auto &slider: m_io_sliders)
         {
-            setSliderProps(slider);
+            BaseEditor::setSliderProps(slider);
         }
 
         m_io_sliders[kInput].setName("In");
@@ -29,11 +28,11 @@ namespace viator::gui::editors
 
         // MENUS
         juce::StringArray items = {"Presets"};
-        setComboBoxProps(m_preset_browser, items);
+        BaseEditor::setComboBoxProps(m_preset_browser, items);
 
         items.clear();
         items = {"Off", "X2", "X4", "X8", "X16"};
-        setComboBoxProps(m_oversampling_menu, items);
+        BaseEditor::setComboBoxProps(m_oversampling_menu, items);
         m_oversampling_menu_attach = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(
             processorRef
             .getTreeState(),
@@ -254,7 +253,7 @@ namespace viator::gui::editors
             for (int x = 0; x < w; ++x)
             {
                 const float n = (rng.nextFloat() * 2.0f - 1.0f); // -1..1
-                const float v = 0.5f + 0.5f * n;                // 0..1
+                const float v = 0.5f + 0.5f * n; // 0..1
 
                 // tiny brightness variation around neutral grey
                 const auto c = static_cast<juce::uint8>(juce::jlimit(0, 255, static_cast<int>(std::round(v * 255.0f))));

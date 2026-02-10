@@ -91,7 +91,7 @@ namespace viator::gui::editors
         const auto text = "Program Tube Equalizer";
         const auto x = juce::roundToInt(getWidth() * 0.45);
         const auto y = juce::roundToInt(getHeight() * 0.84);
-        g.setColour(juce::Colour(128, 195, 255));
+        g.setColour(juce::Colour(177, 59, 255));
         g.setFont(gui_utils::Fonts::bold(12.0f));
         g.drawFittedText(text, x, y, getWidth() / 2, getHeight() / 10, juce::Justification::centredRight, {});
     }
