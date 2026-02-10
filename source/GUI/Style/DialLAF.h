@@ -9,7 +9,8 @@
 
 namespace viator::laf
 {
-    class KnobUtils {
+    class KnobUtils
+    {
     public:
         static void draw_ticks(juce::Graphics &g, const juce::Slider &slider, const float radiusMult = 0.05f)
         {
@@ -26,10 +27,8 @@ namespace viator::laf
             const auto font = gui_utils::Fonts::bold(font_size);
             g.setFont(font);
 
-            if (slider.getName() != "Type")
-            {
-                for (int i = 0; i < numSteps; ++i)
-                {
+            if (slider.getName() != "Type") {
+                for (int i = 0; i < numSteps; ++i) {
                     const float t = static_cast<float>(i) / (numSteps - 1);
                     const auto value = static_cast<float>(slider.getNormalisableRange().convertFrom0to1(t));
                     const auto angle = juce::jmap(t, 0.0f, 1.0f, startAngle, endAngle) - juce::MathConstants<
@@ -40,12 +39,10 @@ namespace viator::laf
                     const float y = center.y + std::sin(angle) * labelRadius;
 
                     juce::String label;
-                    if (std::abs(value) >= 1000.0f)
-                    {
+                    if (std::abs(value) >= 1000.0f) {
                         const int valueInK = static_cast<int>(std::round(value / 1000.0f));
                         label = juce::String(valueInK) + "k";
-                    } else
-                    {
+                    } else {
                         label = juce::String(static_cast<int>(std::round(std::abs(value))));
                     }
 
@@ -53,8 +50,7 @@ namespace viator::laf
                     const float textWidth = juce::TextLayout::getStringWidth(juce::AttributedString(label));
                     const float textHeight = g.getCurrentFont().getAscent();
 
-                    if (i == 0 || i == 5 || i == 10)
-                    {
+                    if (i == 0 || i == 5 || i == 10) {
                         const juce::Rectangle<float> textBounds(x - textWidth / 2.0f, y - textHeight / 2.0f, textWidth,
                                                                 textHeight);
                         g.drawText(label, textBounds, juce::Justification::centred);
@@ -63,8 +59,7 @@ namespace viator::laf
             }
 
             // Draw tick marks
-            for (int i = 0; i < numSteps; ++i)
-            {
+            for (int i = 0; i < numSteps; ++i) {
                 const float t = static_cast<float>(i) / (numSteps - 1);
                 const auto angle = juce::jmap(t, 0.0f, 1.0f, startAngle, endAngle) - juce::MathConstants<float>::halfPi;
 
@@ -84,7 +79,8 @@ namespace viator::laf
         }
     };
 
-    class DialLAF final : public juce::LookAndFeel_V4 {
+    class DialLAF final : public juce::LookAndFeel_V4
+    {
     public:
         enum class FillMode { UnipolarMinToValue, BipolarZeroToValue, None };
 
@@ -92,8 +88,7 @@ namespace viator::laf
         {
             const bool is_db = suffix.trim().equalsIgnoreCase("dB");
 
-            if (const bool is_hz = suffix.containsIgnoreCase("hz"); !is_db && is_hz && std::abs(value) >= 1000.0)
-            {
+            if (const bool is_hz = suffix.containsIgnoreCase("hz"); !is_db && is_hz && std::abs(value) >= 1000.0) {
                 const auto k = value / 1000.0;
                 const auto k_trunc_1dp = std::floor(k * 10.0) / 10.0;
                 return juce::String(k_trunc_1dp, 1) + "k";
@@ -111,7 +106,8 @@ namespace viator::laf
         {
             KnobUtils::draw_ticks(g, slider);
 
-            auto b = juce::Rectangle<float>(static_cast<float>(x), static_cast<float>(y), static_cast<float>(width), static_cast<float>(height)).
+            auto b = juce::Rectangle<float>(static_cast<float>(x), static_cast<float>(y), static_cast<float>(width),
+                                            static_cast<float>(height)).
                     reduced(static_cast<float>(width) * 0.18f);
             auto centre = b.getCentre();
             auto r = juce::jmin(b.getWidth(), b.getHeight()) * 0.5f;
@@ -142,12 +138,10 @@ namespace viator::laf
             const auto v = static_cast<float>(slider.getValue());
             const float valueAngle = angleForValue(v);
             const float rimW = faceRadius * 0.075f;
-            auto outline = faceBounds.reduced(rimW * 0.15f);
-            {
+            auto outline = faceBounds.reduced(rimW * 0.15f); {
                 const auto shadowBase = juce::Colours::black;
 
-                for (int i = 0; i < 10; ++i)
-                {
+                for (int i = 0; i < 10; ++i) {
                     constexpr float step = 0.2f;
                     constexpr float totalAlpha = 0.18f;
                     const float t = static_cast<float>(i) / 9.0f;
@@ -169,16 +163,33 @@ namespace viator::laf
             g.setGradientFill(faceGrad);
             g.fillEllipse(faceBounds);
 
-            g.setColour(trackColour.withAlpha(0.85f));
             {
                 auto bevelBounds = faceBounds.reduced(rimW * 0.75f);
-                juce::Path ring;
-                ring.addEllipse(bevelBounds);
+                const auto bc = bevelBounds.getCentre();
+                const float br = bevelBounds.getWidth() * 0.45f;
+
+                const float bAmp = rimW * 0.22f; // smaller than outline looks nicer
+                const int bLobes = 20;
+                const float bPhase = 0.0f;
+                const int bPts = 200;
+
+                juce::Path ring = makeWavyCirclePath(bc, br, bAmp, bLobes, bPhase, bPts);
 
                 auto bw = faceRadius * 0.055f;
 
+                juce::ColourGradient lo(
+                    juce::Colours::transparentBlack,
+                    bevelBounds.getCentreX(), bevelBounds.getCentreY(),
+                    juce::Colours::black.withAlpha(0.35f),
+                    bevelBounds.getRight(), bevelBounds.getBottom(),
+                    true
+                );
+
+                g.setGradientFill(lo);
+                g.strokePath(ring, juce::PathStrokeType(bw, juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
+
                 juce::ColourGradient hi(
-                    juce::Colours::white.withAlpha(0.22f),
+                    juce::Colours::white.withAlpha(0.35f),
                     bevelBounds.getX(), bevelBounds.getY(),
                     juce::Colours::transparentBlack,
                     bevelBounds.getCentreX(), bevelBounds.getCentreY(),
@@ -188,16 +199,6 @@ namespace viator::laf
                 g.setGradientFill(hi);
                 g.strokePath(ring, juce::PathStrokeType(bw, juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
 
-                juce::ColourGradient lo(
-                    juce::Colours::transparentBlack,
-                    bevelBounds.getCentreX(), bevelBounds.getCentreY(),
-                    juce::Colours::black.withAlpha(0.18f),
-                    bevelBounds.getRight(), bevelBounds.getBottom(),
-                    true
-                );
-
-                g.setGradientFill(lo);
-                g.strokePath(ring, juce::PathStrokeType(bw, juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
             }
             {
                 const float dotAngle = valueAngle - juce::MathConstants<float>::halfPi;
@@ -229,16 +230,52 @@ namespace viator::laf
             g.drawText(text, 0, height - juce::roundToInt(font_size), width, juce::roundToInt(font_size),
                        juce::Justification::centredBottom);
         }
+
+        static juce::Path makeWavyCirclePath(juce::Point<float> centre,
+                                             float baseRadius,
+                                             float amplitudePx, // how “tall” the waves are (pixels)
+                                             int lobes, // number of bumps around the circle
+                                             float phaseRadians, // rotate the pattern
+                                             int points) // resolution (>= 64 is typical)
+        {
+            juce::Path p;
+            points = juce::jmax(16, points);
+            lobes = juce::jmax(1, lobes);
+
+            const float twoPi = juce::MathConstants<float>::twoPi;
+
+            auto radiusAt = [&](float a)
+            {
+                // pure radial sinusoid (clean, stable)
+                const float wave = std::sin(static_cast<float>(lobes) * a + phaseRadians);
+                return baseRadius + amplitudePx * wave;
+            };
+
+            for (int i = 0; i < points; ++i) {
+                const float t = static_cast<float>(i) / static_cast<float>(points);
+                const float a = t * twoPi;
+
+                const float rr = radiusAt(a);
+                const float x = centre.x + rr * std::cos(a);
+                const float y = centre.y + rr * std::sin(a);
+
+                if (i == 0) p.startNewSubPath(x, y);
+                else p.lineTo(x, y);
+            }
+
+            p.closeSubPath();
+            return p;
+        }
     };
 
-    class PultecHandleDialLAF final : public juce::LookAndFeel_V4 {
+    class PultecHandleDialLAF final : public juce::LookAndFeel_V4
+    {
     public:
         static juce::String formatKnobValue(const double value, const juce::String &suffix)
         {
             const bool is_db = suffix.trim().equalsIgnoreCase("dB");
 
-            if (const bool is_hz = suffix.containsIgnoreCase("hz"); !is_db && is_hz && std::abs(value) >= 1000.0)
-            {
+            if (const bool is_hz = suffix.containsIgnoreCase("hz"); !is_db && is_hz && std::abs(value) >= 1000.0) {
                 const auto k = value / 1000.0;
                 const auto k_trunc_1dp = std::floor(k * 10.0) / 10.0;
                 return juce::String(k_trunc_1dp, 1) + "k";
@@ -256,7 +293,8 @@ namespace viator::laf
         {
             KnobUtils::draw_ticks(g, slider);
 
-            auto b = juce::Rectangle<float>(static_cast<float>(x), static_cast<float>(y), static_cast<float>(width), static_cast<float>(height)).
+            auto b = juce::Rectangle<float>(static_cast<float>(x), static_cast<float>(y), static_cast<float>(width),
+                                            static_cast<float>(height)).
                     reduced(static_cast<float>(width) * 0.18f);
             auto centre = b.getCentre();
             auto r = juce::jmin(b.getWidth(), b.getHeight()) * 0.5f;
@@ -313,7 +351,7 @@ namespace viator::laf
             // Apply rotation based on the dial value
             float angle = toAngle; // Use the calculated angle
             juce::AffineTransform transform = juce::AffineTransform::rotation(angle)
-                .translated(centre.getX(), centre.getY());
+                    .translated(centre.getX(), centre.getY());
             dialRect.applyTransform(transform);
 
             // Draw the rounded rectangle
@@ -329,9 +367,7 @@ namespace viator::laf
             g.fillPath(dialRect);
 
             g.setColour(juce::Colours::black.withAlpha(0.25f));
-            g.strokePath(dialRect, juce::PathStrokeType(1.0f, juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
-
-            {
+            g.strokePath(dialRect, juce::PathStrokeType(1.0f, juce::PathStrokeType::curved, juce::PathStrokeType::rounded)); {
                 const auto v = static_cast<float>(slider.getValue());
                 const float valueAngle = angleForValue(v);
                 const float dotAngle = valueAngle - juce::MathConstants<float>::halfPi;

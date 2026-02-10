@@ -81,6 +81,23 @@ namespace viator::dsp::processors
             LVPultecEQParameters::tubeButtonName + juce::String(id),
             false));
 
+        params.push_back(std::make_unique<juce::AudioParameterFloat>(
+            juce::ParameterID{LVPultecEQParameters::hpCutoffID + juce::String(id), 1},
+            LVPultecEQParameters::hpCutoffName + juce::String(id),
+            range, 20.0f));
+
+        params.push_back(std::make_unique<juce::AudioParameterFloat>(
+            juce::ParameterID{LVPultecEQParameters::lpCutoffID + juce::String(id), 1},
+            LVPultecEQParameters::lpCutoffName + juce::String(id),
+            range, 20000.0f));
+
+        params.push_back(std::make_unique<juce::AudioParameterFloat>(
+            juce::ParameterID{LVPultecEQParameters::driveID + juce::String(id), 1},
+            LVPultecEQParameters::driveName + juce::String(id),
+            0.0f,
+            10.0f,
+            0.0f));
+
         return {params.begin(), params.end()};
     }
 

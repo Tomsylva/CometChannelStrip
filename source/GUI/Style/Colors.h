@@ -23,5 +23,7 @@ namespace viator::gui_utils
         static juce::Colour widget_on()      { return {75, 77, 79}; }
         static juce::Colour dial_bg()      { return {144, 144, 147}; }
         static juce::Colour graphic_slider_blue() {return {141, 188, 229};}
+        static juce::Colour eq_footer_dials() {return {144, 144, 147};}
+        static juce::Colour pultec_dial() {return {55, 53, 62};}
     };
 }

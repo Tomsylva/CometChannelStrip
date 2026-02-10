@@ -53,6 +53,10 @@ namespace viator::gui::editors
         m_main_sliders[kLP].setName("LP");
         m_main_sliders[kDrive].setName("Drive");
 
+        m_main_sliders[kLP].setColour(juce::Slider::ColourIds::backgroundColourId, gui_utils::Colors::eq_footer_dials());
+        m_main_sliders[kHP].setColour(juce::Slider::ColourIds::backgroundColourId, gui_utils::Colors::eq_footer_dials());
+        m_main_sliders[kDrive].setColour(juce::Slider::ColourIds::backgroundColourId, gui_utils::Colors::eq_footer_dials());
+
         setSize(1000, 600);
     }
 
@@ -122,10 +126,11 @@ namespace viator::gui::editors
             slider.setLookAndFeel(&m_slider_laf);
         } else
         {
-            slider.setColour(juce::Slider::ColourIds::backgroundColourId, juce::Colour(157, 178, 191));
             slider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
+            slider.setColour(juce::Slider::ColourIds::backgroundColourId, juce::Colour(157, 178, 191));
             slider.setColour(juce::Slider::ColourIds::rotarySliderOutlineColourId, juce::Colour(215, 215, 215).withAlpha(0.85f));
             slider.setColour(juce::Slider::ColourIds::thumbColourId, juce::Colour(5, 120, 190));
+            slider.setColour(juce::Slider::ColourIds::trackColourId, juce::Colours::whitesmoke);
             slider.setLookAndFeel(&m_dial_laf);
         }
 

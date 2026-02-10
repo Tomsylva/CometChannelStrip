@@ -44,7 +44,17 @@ namespace LVPultecEQParameters
     inline const juce::String powerButtonID = "powerButtonID";
     inline const juce::String powerButtonName = "Power";
 
-    struct parameters {
+    inline const juce::String hpCutoffID = "hpCutoffID";
+    inline const juce::String hpCutoffName = "HP Hz";
+
+    inline const juce::String lpCutoffID = "lpCutoffID";
+    inline const juce::String lpCutoffName = "LP Hz";
+
+    inline const juce::String driveID = "driveID";
+    inline const juce::String driveName = "Drive";
+
+    struct parameters
+    {
         explicit parameters(const juce::AudioProcessorValueTreeState &state, const int id)
         {
             oversamplingParam = dynamic_cast<juce::AudioParameterChoice *>(state.getParameter(
@@ -70,6 +80,15 @@ namespace LVPultecEQParameters
             bandwidthParam = dynamic_cast<juce::AudioParameterFloat *>(state.getParameter(
                 bandwidthID + juce::String(id)));
 
+            hpCutoffParam = dynamic_cast<juce::AudioParameterFloat *>(state.getParameter(
+                hpCutoffID + juce::String(id)));
+
+            lpCutoffParam = dynamic_cast<juce::AudioParameterFloat *>(state.getParameter(
+                lpCutoffID + juce::String(id)));
+
+            driveParam = dynamic_cast<juce::AudioParameterFloat *>(state.getParameter(
+                driveID + juce::String(id)));
+
             tubeButtonParam = dynamic_cast<juce::AudioParameterBool *>(state.getParameter(
                 tubeButtonID + juce::String(id)));
             powerButtonParam = dynamic_cast<juce::AudioParameterBool *>(state.getParameter(
@@ -90,18 +109,24 @@ namespace LVPultecEQParameters
 
         juce::AudioParameterBool *tubeButtonParam{nullptr};
         juce::AudioParameterBool *powerButtonParam{nullptr};
+
+        juce::AudioParameterFloat *hpCutoffParam{nullptr};
+        juce::AudioParameterFloat *lpCutoffParam{nullptr};
+        juce::AudioParameterFloat *driveParam{nullptr};
     };
 }
 
 namespace viator::dsp
 {
-    class LVPultecEQProcessBlock {
+    class LVPultecEQProcessBlock
+    {
     public:
         LVPultecEQProcessBlock() = default;
 
         ~LVPultecEQProcessBlock() = default;
 
-        enum {
+        enum
+        {
             kLowBoost = 0, kLowAtten, kHighBoost, kHighAtten, kHighAttenSel,
             num_filters
         };
@@ -121,19 +146,17 @@ namespace viator::dsp
                                                                               true);
             m_oversampler->initProcessing(spec.maximumBlockSize);
 
-            for (auto &filter: m_filters)
-            {
+            for (auto &filter: m_filters) {
                 filter.prepare(spec);
             }
 
-            for (auto &tube: m_tubes)
-            {
+            for (auto &tube: m_tubes) {
                 tube.prepare(spec);
             }
 
             setTriodeParams(m_tubes[0], 10.0f, 0.0f, 17000.0f, 8.0f);
-            setTriodeParams(m_tubes[1], 10.0f, 0.0f,  17000.0f, 32.0f);
-            setTriodeParams(m_tubes[2], 10.0f, 0.0f,  17000.0f, 40.0f);
+            setTriodeParams(m_tubes[1], 10.0f, 0.0f, 17000.0f, 32.0f);
+            setTriodeParams(m_tubes[2], 10.0f, 0.0f, 17000.0f, 40.0f);
 
             m_tubes[0].setInput(-18.0f);
             m_tubes[0].setOutput(-6.0f);
@@ -156,8 +179,7 @@ namespace viator::dsp
 
             m_oversampler->processSamplesDown(block);
 
-            for (auto& filter: m_filters)
-            {
+            for (auto &filter: m_filters) {
                 filter.process(juce::dsp::ProcessContextReplacing<float>(block));
             }
         }
@@ -179,12 +201,15 @@ namespace viator::dsp
             *m_filters[kLowAtten].state = *juce::dsp::IIR::Coefficients<float>::makeLowShelf(
                 m_sample_rate, low_freq * 2.0f * 1.45f, bandwidth, juce::Decibels::decibelsToGain(-low_atten * 0.5f));
 
-            *m_filters[kHighBoost].state = *juce::dsp::IIR::Coefficients<float>::makePeakFilter(m_sample_rate, high_freq, bandwidth,
-                                                                                              juce::Decibels::decibelsToGain(high_boost));
-            *m_filters[kHighAtten].state = *juce::dsp::IIR::Coefficients<float>::makeHighShelf(m_sample_rate, high_freq, bandwidth,
-                                                                                              juce::Decibels::decibelsToGain(-high_atten));
+            *m_filters[kHighBoost].state = *juce::dsp::IIR::Coefficients<float>::makePeakFilter(
+                m_sample_rate, high_freq, bandwidth,
+                juce::Decibels::decibelsToGain(high_boost));
+            *m_filters[kHighAtten].state = *juce::dsp::IIR::Coefficients<float>::makeHighShelf(
+                m_sample_rate, high_freq, bandwidth,
+                juce::Decibels::decibelsToGain(-high_atten));
 
-            *m_filters[kHighAttenSel].state = *juce::dsp::IIR::Coefficients<float>::makeHighShelf(m_sample_rate, high_atten_select, 0.4f,
+            *m_filters[kHighAttenSel].state = *juce::dsp::IIR::Coefficients<float>::makeHighShelf(
+                m_sample_rate, high_atten_select, 0.4f,
                 juce::Decibels::decibelsToGain(-16.0f));
         }
 
@@ -196,11 +221,11 @@ namespace viator::dsp
         float m_sample_rate{44100.0f};
         bool m_tube_on{false};
 
-        static inline void setTriodeParams(Triode& triode,
-                    const float low_shelf_hz,
-                    const float low_shelf_gain,
-                    const float miller_cap_hz,
-                    const float dc_filter_hz)
+        static inline void setTriodeParams(Triode &triode,
+                                           const float low_shelf_hz,
+                                           const float low_shelf_gain,
+                                           const float miller_cap_hz,
+                                           const float dc_filter_hz)
         {
             Triode::TriodeParameters params;
             params.low_shelf_hz = low_shelf_hz;

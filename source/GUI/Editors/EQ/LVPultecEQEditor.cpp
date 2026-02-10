@@ -14,14 +14,15 @@ namespace viator::gui::editors
 
         const juce::StringArray ids = {
             LVPultecEQParameters::lowBoostID, LVPultecEQParameters::lowAttenID, LVPultecEQParameters::highBoostID, LVPultecEQParameters::highAttenID,
-            LVPultecEQParameters::lowFreqID, LVPultecEQParameters::bandwidthID, LVPultecEQParameters::highFreqID, LVPultecEQParameters::highAttenSelID
+            LVPultecEQParameters::lowFreqID, LVPultecEQParameters::bandwidthID, LVPultecEQParameters::highFreqID, LVPultecEQParameters::highAttenSelID,
+            LVPultecEQParameters::hpCutoffID, LVPultecEQParameters::driveID, LVPultecEQParameters::lpCutoffID
         };
 
         const juce::StringArray names = {
             LVPultecEQParameters::lowBoostName, LVPultecEQParameters::lowAttenName, LVPultecEQParameters::highBoostName,
-            LVPultecEQParameters::highAttenName,
-            LVPultecEQParameters::lowFreqName, LVPultecEQParameters::bandwidthName, LVPultecEQParameters::highFreqName,
-            LVPultecEQParameters::highAttenSelName
+            LVPultecEQParameters::highAttenName, LVPultecEQParameters::lowFreqName, LVPultecEQParameters::bandwidthName,
+            LVPultecEQParameters::highFreqName, LVPultecEQParameters::highAttenSelName,
+            LVPultecEQParameters::hpCutoffName, LVPultecEQParameters::driveName, LVPultecEQParameters::lpCutoffName
         };
 
         for (int i = 0; i < num_sliders; ++i)
@@ -43,31 +44,25 @@ namespace viator::gui::editors
         m_main_sliders[kHighFreq].setTextValueSuffix(" Hz");
         m_main_sliders[kHighAttenSel].setTextValueSuffix(" Hz");
         m_main_sliders[kBandwidth].setTextValueSuffix(" Q");
+        m_main_sliders[kHP].setTextValueSuffix(" Hz");
+        m_main_sliders[kDrive].setTextValueSuffix(" dB");
+        m_main_sliders[kLP].setTextValueSuffix(" Hz");
 
         m_main_sliders[kLowFreq].setColour(juce::Slider::ColourIds::rotarySliderOutlineColourId, gui_utils::Colors::dial_bg());
         m_main_sliders[kHighFreq].setColour(juce::Slider::ColourIds::rotarySliderOutlineColourId, gui_utils::Colors::dial_bg());
         m_main_sliders[kHighAttenSel].setColour(juce::Slider::ColourIds::rotarySliderOutlineColourId, gui_utils::Colors::dial_bg());
 
-        m_main_sliders[kLowFreq].setColour(juce::Slider::ColourIds::backgroundColourId, juce::Colour(57, 62, 70));
-        m_main_sliders[kHighFreq].setColour(juce::Slider::ColourIds::backgroundColourId, juce::Colour(57, 62, 70));
-        m_main_sliders[kHighAttenSel].setColour(juce::Slider::ColourIds::backgroundColourId, juce::Colour(57, 62, 70));
+        m_main_sliders[kLowFreq].setColour(juce::Slider::ColourIds::backgroundColourId, gui_utils::Colors::pultec_dial());
+        m_main_sliders[kHighFreq].setColour(juce::Slider::ColourIds::backgroundColourId, gui_utils::Colors::pultec_dial());
+        m_main_sliders[kHighAttenSel].setColour(juce::Slider::ColourIds::backgroundColourId, gui_utils::Colors::pultec_dial());
+
+        m_main_sliders[kHP].setColour(juce::Slider::ColourIds::backgroundColourId, gui_utils::Colors::eq_footer_dials());
+        m_main_sliders[kDrive].setColour(juce::Slider::ColourIds::backgroundColourId, gui_utils::Colors::eq_footer_dials());
+        m_main_sliders[kLP].setColour(juce::Slider::ColourIds::backgroundColourId, gui_utils::Colors::eq_footer_dials());
 
         m_main_sliders[kLowFreq].setLookAndFeel(&m_rect_dial_laf);
         m_main_sliders[kHighFreq].setLookAndFeel(&m_rect_dial_laf);
         m_main_sliders[kHighAttenSel].setLookAndFeel(&m_rect_dial_laf);
-
-        m_tube_button.setButtonText("Tube");
-        m_tube_button.setClickingTogglesState(true);
-        m_tube_button.setColour(juce::ComboBox::ColourIds::outlineColourId,
-                         juce::Colours::transparentBlack);
-        m_tube_button.setColour(juce::TextButton::ColourIds::buttonColourId, m_bg_color);
-        m_tube_button.setColour(juce::TextButton::ColourIds::buttonOnColourId, gui_utils::Colors::light_bg().withAlpha(0.5f));
-        m_tube_button.setColour(juce::TextButton::ColourIds::textColourOffId, juce::Colour(122, 126, 130));
-        m_tube_button.setColour(juce::TextButton::ColourIds::textColourOnId, juce::Colour(128, 195, 255));
-        m_tube_button.setLookAndFeel(&m_button_laf);
-        addAndMakeVisible(m_tube_button);
-
-        m_tube_attach = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(processorRef.getTreeState(), LVPultecEQParameters::tubeButtonID + id, m_tube_button);
 
         setSize(1000, 600);
     }
@@ -78,8 +73,6 @@ namespace viator::gui::editors
         {
             slider.setLookAndFeel(nullptr);
         }
-
-        m_tube_button.setLookAndFeel(nullptr);
     }
 
     //==============================================================================
@@ -88,42 +81,47 @@ namespace viator::gui::editors
         setBackgroundColor(m_bg_color);
         BaseEditor::paint(g);
 
-        const auto text = "Program Tube Equalizer";
-        const auto x = juce::roundToInt(getWidth() * 0.45);
-        const auto y = juce::roundToInt(getHeight() * 0.84);
-        g.setColour(juce::Colour(177, 59, 255));
+        const auto text = "Program Tube \nEqualizer";
+        const auto x = juce::roundToInt(getWidth() * 0.58);
+        const auto y = juce::roundToInt(getHeight() * 0.325);
+        g.setColour(juce::Colour(120, 185, 181));
         g.setFont(gui_utils::Fonts::bold(12.0f));
-        g.drawFittedText(text, x, y, getWidth() / 2, getHeight() / 10, juce::Justification::centredRight, {});
+        g.drawFittedText(text, x, y, getWidth() / 2, getHeight() / 10, juce::Justification::centred, 2);
     }
 
     void LVPultecEQEditor::resized()
     {
         auto width = juce::roundToInt(getWidth() * 0.34);
-        auto x = juce::roundToInt(getWidth() * 0.05);
-        auto y = getHeight() - juce::roundToInt(width * 1.5);
+        auto x = 0;
+        auto y = juce::roundToInt(getHeight() * 0.07);
 
-        for (int i = 0; i < 4; ++i)
-        {
-            m_main_sliders[i].setBounds(x, y, width, width);
-            y -= width;
-        }
-
-        y = juce::roundToInt(getHeight() * 0.62);
-        x = getWidth() - x - width;
+        m_main_sliders[kLowAtten].setBounds(x, y, width, width);
+        y += width;
+        m_main_sliders[kLowBoost].setBounds(x, y, width, width);
+        y += width;
         m_main_sliders[kLowFreq].setBounds(x, y, width, width);
-        x = juce::roundToInt(getWidth() * 0.41);
-        y = juce::roundToInt(getHeight() * 0.45);
-        m_main_sliders[kBandwidth].setBounds(x, y, width, width);
-        y = juce::roundToInt(getHeight() * 0.25);
-        m_main_sliders[kHighFreq].setBounds(m_main_sliders[kLowFreq].getX(), y, width, width);
-        x = juce::roundToInt(getWidth() * 0.405);
-        y = m_main_sliders[kHighAtten].getY();
+        y = juce::roundToInt(getHeight() * 0.07);
+        x += width;
+        m_main_sliders[kHighAtten].setBounds(x, y, width, width);
+        y += width;
+        m_main_sliders[kHighBoost].setBounds(x, y, width, width);
+        y += width;
+        m_main_sliders[kHighFreq].setBounds(x, y, width, width);
+        y = juce::roundToInt(getHeight() * 0.07);
+        x += juce::roundToInt(width * 0.9);
         m_main_sliders[kHighAttenSel].setBounds(x, y, width, width);
+        y += width * 2;
+        m_main_sliders[kBandwidth].setBounds(x, y, width, width);
 
-        width = juce::roundToInt(getWidth() * 0.2);
-        x = getWidth() - x / 2;
-        y = juce::roundToInt(getHeight() * 0.1);
-        m_tube_button.setBounds(getLocalBounds().withSizeKeepingCentre(width, width / 2).withY(y).withX(x));
+        width = juce::roundToInt(getWidth() * 0.335);
+        y = juce::roundToInt(getHeight() * 0.7);
+        x = 0;
+        const auto filter_size = juce::roundToInt(width * 0.85);
+        m_main_sliders[kHP].setBounds(x, y, filter_size, filter_size);
+        x += width;
+        m_main_sliders[kDrive].setBounds(x, y, width, width);
+        x += width + (width - filter_size);
+        m_main_sliders[kLP].setBounds(x, y, filter_size, filter_size);
 
         BaseEditor::resized();
     }
@@ -135,7 +133,7 @@ namespace viator::gui::editors
         slider.setColour(juce::Slider::ColourIds::rotarySliderOutlineColourId, juce::Colour(215, 215, 215).withAlpha(0.85f));
         slider.setColour(juce::Slider::ColourIds::trackColourId, juce::Colours::whitesmoke);
         slider.setColour(juce::Slider::ColourIds::rotarySliderFillColourId, juce::Colour(211, 218, 217));
-        slider.setColour(juce::Slider::ColourIds::backgroundColourId, juce::Colour(68, 68, 78));
+        slider.setColour(juce::Slider::ColourIds::backgroundColourId, gui_utils::Colors::pultec_dial());
         slider.setLookAndFeel(&m_dial_laf);
 
         addAndMakeVisible(slider);

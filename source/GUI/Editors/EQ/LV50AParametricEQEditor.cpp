@@ -28,9 +28,9 @@ namespace viator::gui::editors
         m_main_sliders[kQ2].setColour(juce::Slider::ColourIds::backgroundColourId, juce::Colour(247, 55, 79));
         m_main_sliders[kQ3].setColour(juce::Slider::ColourIds::backgroundColourId, juce::Colour(247, 55, 79));
 
-        m_main_sliders[kLP].setColour(juce::Slider::ColourIds::backgroundColourId, juce::Colour(157, 178, 191));
-        m_main_sliders[kHP].setColour(juce::Slider::ColourIds::backgroundColourId, juce::Colour(157, 178, 191));
-        m_main_sliders[kDrive].setColour(juce::Slider::ColourIds::backgroundColourId, juce::Colour(157, 178, 191));
+        m_main_sliders[kLP].setColour(juce::Slider::ColourIds::backgroundColourId, gui_utils::Colors::eq_footer_dials());
+        m_main_sliders[kHP].setColour(juce::Slider::ColourIds::backgroundColourId, gui_utils::Colors::eq_footer_dials());
+        m_main_sliders[kDrive].setColour(juce::Slider::ColourIds::backgroundColourId, gui_utils::Colors::eq_footer_dials());
 
         for (auto &label: m_main_labels)
         {

@@ -25,7 +25,7 @@ namespace viator::gui::editors
         {
             kLowBoost = 0, kLowAtten, kHighBoost, kHighAtten,
             kLowFreq, kBandwidth, kHighFreq, kHighAttenSel,
-            num_sliders
+            kDrive, kLP, kHP, num_sliders
         };
 
     private:
@@ -39,10 +39,6 @@ namespace viator::gui::editors
         void setSliderProps(juce::Slider &slider);
 
         void setLabelProps(juce::Label &label);
-
-        juce::TextButton m_tube_button;
-        std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> m_tube_attach;
-        viator::laf::InsetToggleLAF m_button_laf;
 
         viator::laf::DialLAF m_dial_laf;
         viator::laf::PultecHandleDialLAF m_rect_dial_laf;
