@@ -15,8 +15,6 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
     m_parameters = std::make_unique<viator::parameters::parameters>(m_tree_state);
 
     m_processors.clear();
-    //addProcessor(viator::ProcessorType::kClipper);
-    //addProcessor(viator::ProcessorType::kClipper);
 
     for (int i = 0; i < 10; ++i)
     {
@@ -25,8 +23,7 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
 }
 
 AudioPluginAudioProcessor::~AudioPluginAudioProcessor()
-{
-}
+= default;
 
 //==============================================================================
 const juce::String AudioPluginAudioProcessor::getName() const
@@ -130,14 +127,14 @@ juce::AudioProcessorValueTreeState::ParameterLayout AudioPluginAudioProcessor::c
     return {params.begin(), params.end()};
 }
 
-void AudioPluginAudioProcessor::parameterChanged(const juce::String &parameterID, float newValue)
+void AudioPluginAudioProcessor::parameterChanged(const juce::String &parameterID, const float newValue)
 {
     for (const auto &processor: m_processors)
     {
-        if (const auto *module_processor = dynamic_cast<viator::BaseProcessor *>(processor.get()))
+        if (processor)
         {
-            auto &tree = module_processor->getTreeState();
-            if (auto *param = m_tree_state.getParameter(parameterID))
+            auto &tree = processor->getTreeState();
+            if (m_tree_state.getParameter(parameterID))
             {
                 m_macro_map.update(tree, parameterID, newValue);
             }
@@ -145,17 +142,8 @@ void AudioPluginAudioProcessor::parameterChanged(const juce::String &parameterID
     }
 }
 
-void AudioPluginAudioProcessor::updateParameters()
-{
-//    const auto oversampling_choice = m_parameters->oversamplingParam->getIndex();
-//    if (oversampling_choice >= 0 && static_cast<size_t>(oversampling_choice) < m_process_blocks.size())
-//    {
-//        m_process_blocks[static_cast<size_t>(oversampling_choice)].updateParameters(*m_parameters);
-//    }
-}
-
 //==============================================================================
-void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
+void AudioPluginAudioProcessor::prepareToPlay (const double sampleRate, const int samplesPerBlock)
 {
     m_can_process = sampleRate > 0.0;
 
@@ -204,21 +192,18 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     if (!m_can_process)
         return;
 
-    const juce::ScopedTryLock tryLock(m_processor_lock);
-    if (!tryLock.isLocked())
+    if (const juce::ScopedTryLock tryLock(m_processor_lock); !tryLock.isLocked())
         return;
 
     juce::ignoreUnused (midiMessages);
 
-    updateParameters();
-
     juce::ScopedNoDenormals noDenormals;
 
-    for (int i = 0; i < m_processors.size(); ++ i)
+    for (const auto & m_processor : m_processors)
     {
-        if (m_processors[i])
+        if (m_processor)
         {
-            m_processors[i]->processBlock(buffer, midiMessages);
+            m_processor->processBlock(buffer, midiMessages);
         }
     }
 }
@@ -228,9 +213,7 @@ void AudioPluginAudioProcessor::addProcessor(viator::ProcessorType type)
     const juce::ScopedLock lock (m_processor_lock);
 
     const int index = static_cast<int>(m_processors.size());
-    auto processor = viator::createProcessorByType(type, index);
-
-    if (processor)
+    if (auto processor = viator::createProcessorByType(type, index))
     {
         processor->prepareToPlay(getSampleRate(), getBlockSize());
         m_processors.emplace_back(std::move(processor));
@@ -262,7 +245,7 @@ void AudioPluginAudioProcessor::removeProcessor(const int index)
     }
 }
 
-viator::BaseProcessor* AudioPluginAudioProcessor::getProcessor(int index)
+viator::BaseProcessor* AudioPluginAudioProcessor::getProcessor(int index) const
 {
     const juce::ScopedLock lock (m_processor_lock);
 
@@ -304,15 +287,12 @@ void AudioPluginAudioProcessor::getStateInformation (juce::MemoryBlock& destData
         if (auto processorTree = juce::ValueTree::readFromData(subState.getData(), subState.getSize()); processorTree.isValid())
         {
             juce::ValueTree wrapper("Processor");
-
-            const auto &registry = viator::getProcessorRegistry();
-            for (const auto &def: registry)
+            for (const auto& registry = viator::getProcessorRegistry();
+                 const auto& [type, name, category, makeProcessor, makeEditor] : registry)
             {
-                const auto processor_name = processor->getName();
-                const auto name = def.name;
-                if (processor->getName() == def.name)
+                if (processor->getName() == name)
                 {
-                    wrapper.setProperty("type", def.name, nullptr);
+                    wrapper.setProperty("type", name, nullptr);
                     wrapper.setProperty("index", i, nullptr);
                     break;
                 }
@@ -386,8 +366,8 @@ void AudioPluginAudioProcessor::setStateInformation (const void* data, int sizeI
         auto processorTree = wrapper.getChild(0);
         auto processorType = viator::processorTypeFromString(typeStr);
 
-        auto processor = createProcessorByType(processorType, index);
-        if (processor != nullptr)
+
+        if (auto processor = createProcessorByType(processorType, index); processor != nullptr)
         {
             juce::MemoryOutputStream stream;
             processorTree.writeToStream(stream);
@@ -402,8 +382,7 @@ void AudioPluginAudioProcessor::setStateInformation (const void* data, int sizeI
         }
     }
 
-    const auto macros = m_tree_state.state.getChildWithName("Macros");
-    if (macros.isValid())
+    if (const auto macros = m_tree_state.state.getChildWithName("Macros"); macros.isValid())
         m_macro_map.loadMacroState(macros);
 }
 

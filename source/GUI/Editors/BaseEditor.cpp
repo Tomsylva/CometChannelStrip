@@ -105,6 +105,9 @@ namespace viator
         for (auto &button: m_buttons) {
             button.setLookAndFeel(nullptr);
         }
+
+        m_in_attach.reset();
+        m_out_attach.reset();
     }
 
     //==============================================================================

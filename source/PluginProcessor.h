@@ -51,9 +51,9 @@ public:
     juce::AudioProcessorValueTreeState& getTreeState() { return m_tree_state; }
 
     void addProcessor(viator::ProcessorType type);
-    void swapProcessors(const int a, const int b);
-    void removeProcessor(const int index);
-    viator::BaseProcessor* getProcessor(int index);
+    void swapProcessors(int a, int b);
+    void removeProcessor(int index);
+    viator::BaseProcessor* getProcessor(int index) const ;
 
     std::vector<std::unique_ptr<viator::BaseProcessor>>& getProcessors() { return m_processors; }
 
@@ -63,10 +63,8 @@ public:
 private:
 
     juce::AudioProcessorValueTreeState m_tree_state;
-    juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
-    void parameterChanged (const juce::String &parameterID, float newValue);
-
-    void updateParameters();
+    static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+    void parameterChanged (const juce::String &parameterID, float newValue) override;
 
     std::unique_ptr<viator::parameters::parameters> m_parameters;
 
