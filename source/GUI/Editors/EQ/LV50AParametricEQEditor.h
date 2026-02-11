@@ -42,10 +42,6 @@ namespace viator
 
         void setSliderProps(juce::Slider &slider);
 
-        void setLabelProps(juce::Label &label);
-
-        void updateLabels();
-
         viator::DialLAF m_dial_laf;
         viator::MenuLAF m_menu_laf;
     };

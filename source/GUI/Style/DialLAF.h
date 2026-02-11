@@ -47,7 +47,7 @@ namespace viator
                     }
 
 
-                    const float textWidth = juce::TextLayout::getStringWidth(juce::AttributedString(label));
+                    const auto textWidth = static_cast<float>(slider.getWidth());
                     const float textHeight = g.getCurrentFont().getAscent();
 
                     if (i == 0 || i == 5 || i == 10) {
@@ -129,7 +129,8 @@ namespace viator
             const auto faceBounds = juce::Rectangle<float>(faceRadius * 2.0f, faceRadius * 2.0f).withCentre(centre);
 
             const float rimW = faceRadius * 0.075f;
-            auto outline = faceBounds.reduced(rimW * 0.15f); {
+            auto outline = faceBounds.reduced(rimW * 0.15f);
+            {
                 const auto shadowBase = juce::Colours::black;
 
                 for (int i = 0; i < 10; ++i) {
@@ -162,7 +163,7 @@ namespace viator
                 const float bAmp = rimW * 0.22f; // smaller than outline looks nicer
                 const int bLobes = 20;
                 const float bPhase = 0.0f;
-                const int bPts = 200;
+                const int bPts = 20;
 
                 juce::Path ring = makeWavyCirclePath(bc, br, bAmp, bLobes, bPhase, bPts);
 
