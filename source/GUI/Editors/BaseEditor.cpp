@@ -4,9 +4,9 @@
 
 #include "BaseEditor.h"
 
-namespace viator::gui::editors
+namespace viator
 {
-    BaseEditor::BaseEditor(viator::dsp::processors::BaseProcessor &p)
+    BaseEditor::BaseEditor(viator::BaseProcessor &p)
         : AudioProcessorEditor(&p), processorRef(p)
     {
         juce::ignoreUnused(processorRef);
@@ -133,11 +133,11 @@ namespace viator::gui::editors
         const auto header_bottom = juce::roundToInt(getHeight() * 0.05) + 12;
         const auto footer_top = juce::roundToInt(getHeight() * 0.91);
 
-        g.setColour(gui_utils::Colors::main_bg());
+        g.setColour(Colors::main_bg());
         g.fillRect(padding, 0, getWidth() - padding, header_bottom);
         g.fillRect(padding, footer_top, getWidth() - padding, juce::roundToInt(getHeight() * 0.09));
 
-        g.setColour(gui_utils::Colors::medium_bg());
+        g.setColour(Colors::medium_bg());
         g.drawRect(0, 0, getWidth(), getHeight(), padding);
         y = static_cast<float>(getHeight()) * 0.05f + 12.0f;
         g.drawLine(padding, y, static_cast<float>(getWidth()) - padding, y, padding);
@@ -197,7 +197,7 @@ namespace viator::gui::editors
     {
         slider.setSliderStyle(juce::Slider::RotaryVerticalDrag);
         slider.setColour(juce::Slider::ColourIds::thumbColourId, juce::Colours::transparentBlack);
-        slider.setColour(juce::Slider::ColourIds::rotarySliderOutlineColourId, gui_utils::Colors::dial_bg());
+        slider.setColour(juce::Slider::ColourIds::rotarySliderOutlineColourId, Colors::dial_bg());
         slider.setColour(juce::Slider::ColourIds::rotarySliderFillColourId, juce::Colours::whitesmoke);
         slider.setLookAndFeel(&m_io_laf);
         addAndMakeVisible(slider);
@@ -209,7 +209,7 @@ namespace viator::gui::editors
         box.setLookAndFeel(&m_menu_laf);
         box.setColour(juce::ComboBox::ColourIds::outlineColourId, juce::Colours::transparentBlack);
         box.setColour(juce::ComboBox::ColourIds::backgroundColourId, juce::Colours::whitesmoke.withAlpha(0.0f));
-        box.getLookAndFeel().setColour(juce::PopupMenu::ColourIds::backgroundColourId, gui_utils::Colors::light_bg());
+        box.getLookAndFeel().setColour(juce::PopupMenu::ColourIds::backgroundColourId, Colors::light_bg());
         addAndMakeVisible(box);
         box.setSelectedId(1);
     }
@@ -220,9 +220,9 @@ namespace viator::gui::editors
         button.setColour(juce::ComboBox::ColourIds::outlineColourId,
                          juce::Colours::transparentBlack);
         button.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::transparentBlack);
-        button.setColour(juce::TextButton::ColourIds::buttonOnColourId, gui_utils::Colors::light_bg().withAlpha(0.5f));
-        button.setColour(juce::TextButton::ColourIds::textColourOffId, gui_utils::Colors::text());
-        button.setColour(juce::TextButton::ColourIds::textColourOnId, gui_utils::Colors::text());
+        button.setColour(juce::TextButton::ColourIds::buttonOnColourId, Colors::light_bg().withAlpha(0.5f));
+        button.setColour(juce::TextButton::ColourIds::textColourOffId, Colors::text());
+        button.setColour(juce::TextButton::ColourIds::textColourOnId, Colors::text());
         button.setLookAndFeel(&m_button_laf);
         addAndMakeVisible(button);
     }

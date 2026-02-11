@@ -7,21 +7,21 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include "../../Globals/Globals.h"
 
-namespace viator::gui::widgets
+namespace viator
 {
-    class MacroSlider : public juce::Slider, public juce::ActionBroadcaster
+    class MacroSlider final : public juce::Slider, public juce::ActionBroadcaster
     {
     public:
         MacroSlider();
         ~MacroSlider() override;
 
-        using MacroState = viator::globals::MacroLearnState;
+        using MacroState = globals::MacroLearnState;
 
         void paint(juce::Graphics &g) override;
 
         void toggleMacroState();
-        void enableMacroState(const bool shouldBeOn);
-        MacroState getMacroState();
+        void enableMacroState(bool shouldBeOn);
+        MacroState getMacroState() const;
 
         enum class MacroLearnState
         {
@@ -32,7 +32,7 @@ namespace viator::gui::widgets
     private:
         MacroState m_macro_learn_state{MacroState::kOff};
 
-        void mouseDown(const juce::MouseEvent &event);
+        void mouseDown(const juce::MouseEvent &event) override;
     };
 }
 

@@ -5,7 +5,7 @@
 #include "Waveshapers.h"
 #include "Filter.h"
 
-namespace viator::dsp
+namespace viator
 {
     class Triode
     {
@@ -172,7 +172,7 @@ namespace viator::dsp
             }
         }
 
-        static void updateFilter(std::array<viator::dsp::Filter, 2> &filters,
+        static void updateFilter(std::array<viator::Filter, 2> &filters,
                           const float gain,
                           const float q,
                           const float cutoff)

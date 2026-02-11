@@ -1,7 +1,7 @@
 #include "ClipperProcessor.h"
 #include "../../../GUI/Editors/Distortion/ClipperEditor.h"
 
-namespace viator::dsp::processors
+namespace viator
 {
     //==============================================================================
     ClipperProcessor::ClipperProcessor(int id)
@@ -235,6 +235,6 @@ namespace viator::dsp::processors
 
     juce::AudioProcessorEditor *ClipperProcessor::createEditor()
     {
-        return new viator::gui::editors::ClipperEditor(*this);
+        return new viator::ClipperEditor(*this);
     }
 }

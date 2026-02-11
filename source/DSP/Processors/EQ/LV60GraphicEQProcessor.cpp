@@ -2,7 +2,7 @@
 #include "../../../GUI/Editors/EQ/LV60GraphicEQEditor.h"
 #include "Globals/Globals.h"
 
-namespace viator::dsp::processors
+namespace viator
 {
     //==============================================================================
     LV60GraphicEQProcessor::LV60GraphicEQProcessor(int id)
@@ -256,6 +256,6 @@ namespace viator::dsp::processors
 
     juce::AudioProcessorEditor *LV60GraphicEQProcessor::createEditor()
     {
-        return new viator::gui::editors::LV60GraphicEQEditor(*this);
+        return new viator::LV60GraphicEQEditor(*this);
     }
 }

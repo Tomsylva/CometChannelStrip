@@ -2,7 +2,7 @@
 #include "../../../GUI/Editors/EQ/LVPultecEQEditor.h"
 #include "Globals/Globals.h"
 
-namespace viator::dsp::processors
+namespace viator
 {
     //==============================================================================
     LVPultecEQProcessor::LVPultecEQProcessor(int id)
@@ -306,6 +306,6 @@ namespace viator::dsp::processors
 
     juce::AudioProcessorEditor *LVPultecEQProcessor::createEditor()
     {
-        return new viator::gui::editors::LVPultecEQEditor(*this);
+        return new viator::LVPultecEQEditor(*this);
     }
 }

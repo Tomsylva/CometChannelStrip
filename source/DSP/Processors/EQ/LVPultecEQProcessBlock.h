@@ -129,7 +129,7 @@ namespace LVPultecEQParameters
     };
 }
 
-namespace viator::dsp
+namespace viator
 {
     class LVPultecEQProcessBlock
     {

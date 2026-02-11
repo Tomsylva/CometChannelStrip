@@ -7,7 +7,7 @@
 #include "ProcessorIncludes.h"
 #include "../../GUI/Editors/EditorIncludes.h"
 
-namespace viator::dsp::processors
+namespace viator
 {
     enum class ProcessorType
     {
@@ -35,12 +35,12 @@ namespace viator::dsp::processors
                         "Distortion",
                         [](int id)
                         {
-                            return std::make_unique<viator::dsp::processors::ClipperProcessor>(id);
+                            return std::make_unique<viator::ClipperProcessor>(id);
                         },
                         [](juce::AudioProcessor& processor)
                         {
-                            auto& type = dynamic_cast<viator::dsp::processors::ClipperProcessor&>(processor);
-                            return std::make_unique<viator::gui::editors::ClipperEditor>(type);
+                            auto& type = dynamic_cast<viator::ClipperProcessor&>(processor);
+                            return std::make_unique<viator::ClipperEditor>(type);
                         }
                 },
                 {
@@ -49,12 +49,12 @@ namespace viator::dsp::processors
                     "EQ",
                     [](int id)
                     {
-                        return std::make_unique<viator::dsp::processors::LV60GraphicEQProcessor>(id);
+                        return std::make_unique<viator::LV60GraphicEQProcessor>(id);
                     },
                     [](juce::AudioProcessor& processor)
                     {
-                        auto& typed = dynamic_cast<viator::dsp::processors::LV60GraphicEQProcessor&>(processor);
-                        return std::make_unique<viator::gui::editors::LV60GraphicEQEditor>(typed);
+                        auto& typed = dynamic_cast<viator::LV60GraphicEQProcessor&>(processor);
+                        return std::make_unique<viator::LV60GraphicEQEditor>(typed);
                     }
                 },
                 {
@@ -63,12 +63,12 @@ namespace viator::dsp::processors
                     "EQ",
                     [](int id)
                     {
-                        return std::make_unique<viator::dsp::processors::LV50AParametricEQProcessor>(id);
+                        return std::make_unique<viator::LV50AParametricEQProcessor>(id);
                     },
                     [](juce::AudioProcessor& processor)
                     {
-                        auto& typed = dynamic_cast<viator::dsp::processors::LV50AParametricEQProcessor&>(processor);
-                        return std::make_unique<viator::gui::editors::LV50AParametricEQEditor>(typed);
+                        auto& typed = dynamic_cast<viator::LV50AParametricEQProcessor&>(processor);
+                        return std::make_unique<viator::LV50AParametricEQEditor>(typed);
                     }
                 },
                 {
@@ -77,12 +77,12 @@ namespace viator::dsp::processors
                     "EQ",
                     [](int id)
                     {
-                        return std::make_unique<viator::dsp::processors::LVPultecEQProcessor>(id);
+                        return std::make_unique<viator::LVPultecEQProcessor>(id);
                     },
                     [](juce::AudioProcessor& processor)
                     {
-                        auto& typed = dynamic_cast<viator::dsp::processors::LVPultecEQProcessor&>(processor);
-                        return std::make_unique<viator::gui::editors::LVPultecEQEditor>(typed);
+                        auto& typed = dynamic_cast<viator::LVPultecEQProcessor&>(processor);
+                        return std::make_unique<viator::LVPultecEQEditor>(typed);
                     }
                 }
         };
@@ -137,8 +137,8 @@ namespace viator::dsp::processors
         DBG("!! No match found. Falling back or asserting.");
 
         // fallback
-        if (auto *bc = dynamic_cast<viator::dsp::processors::ClipperProcessor *>(processor))
-            return std::make_unique<viator::gui::editors::ClipperEditor>(*bc);
+        if (auto *bc = dynamic_cast<viator::ClipperProcessor *>(processor))
+            return std::make_unique<viator::ClipperEditor>(*bc);
 
         jassertfalse;
         return nullptr;

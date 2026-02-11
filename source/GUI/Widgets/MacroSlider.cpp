@@ -4,17 +4,13 @@
 
 #include "MacroSlider.h"
 
-namespace viator::gui::widgets
+namespace viator
 {
     MacroSlider::MacroSlider()
-    {
-
-    }
+    = default;
 
     MacroSlider::~MacroSlider()
-    {
-
-    }
+    = default;
 
     void MacroSlider::paint(juce::Graphics &g)
     {
@@ -44,7 +40,7 @@ namespace viator::gui::widgets
         repaint();
     }
 
-    MacroSlider::MacroState MacroSlider::getMacroState()
+    MacroSlider::MacroState MacroSlider::getMacroState() const
     {
         return m_macro_learn_state;
     }

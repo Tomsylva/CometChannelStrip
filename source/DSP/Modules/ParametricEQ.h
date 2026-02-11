@@ -12,7 +12,7 @@
 
 #include "juce_dsp/juce_dsp.h"
 
-namespace viator::dsp
+namespace viator
 {
     template<typename SampleType>
     class ParametricEq {

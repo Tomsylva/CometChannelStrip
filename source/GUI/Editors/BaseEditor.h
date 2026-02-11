@@ -15,11 +15,11 @@
 #include "../Style/Images.h"
 #include "../Widgets/LevelMeter.h"
 
-namespace viator::gui::editors
+namespace viator
 {
     class BaseEditor : public juce::AudioProcessorEditor, public juce::ActionBroadcaster, public juce::Timer {
     public:
-        explicit BaseEditor(dsp::processors::BaseProcessor &);
+        explicit BaseEditor(BaseProcessor &);
 
         ~BaseEditor() override;
 
@@ -28,7 +28,7 @@ namespace viator::gui::editors
 
         void resized() override;
 
-        std::vector<widgets::BaseSlider *> &getSliders()
+        std::vector<BaseSlider *> &getSliders()
         {
             return m_sliders;
         }
@@ -53,17 +53,17 @@ namespace viator::gui::editors
                       juce::Justification just = juce::Justification::centred);
 
     private:
-        dsp::processors::BaseProcessor &processorRef;
-        std::vector<widgets::BaseSlider *> m_sliders;
+        BaseProcessor &processorRef;
+        std::vector<BaseSlider *> m_sliders;
         std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> m_in_attach, m_out_attach;
 
         std::array<juce::Slider, 2> m_io_sliders;
-        viator::laf::MacroLAF m_io_laf {1};
+        viator::MacroLAF m_io_laf {1};
 
         virtual void setSliderProps(juce::Slider &slider);
 
         juce::ComboBox m_preset_browser, m_oversampling_menu;
-        laf::MenuLAF m_menu_laf;
+        MenuLAF m_menu_laf;
         std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> m_oversampling_menu_attach;
 
         virtual void setComboBoxProps(juce::ComboBox &box, const juce::StringArray &items);
@@ -72,12 +72,12 @@ namespace viator::gui::editors
         std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> m_mute_attach;
         void setButtonProps(juce::TextButton &button, const juce::String &name);
 
-        juce::Colour m_comp_bg = gui_utils::Colors::light_bg();
+        juce::Colour m_comp_bg = Colors::light_bg();
         juce::Colour m_widget_bg = juce::Colours::black.withAlpha(0.3f);
 
         std::unique_ptr<juce::DropShadower> m_drop_shadow;
 
-        viator::laf::ButtonLAF m_button_laf;
+        viator::ButtonLAF m_button_laf;
 
         std::array<LevelMeter, kNumSliders> m_input_meters, m_output_meters;
 

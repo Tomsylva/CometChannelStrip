@@ -4,7 +4,7 @@
 
 #pragma once
 
-namespace viator::gui_utils
+namespace viator
 {
     class Colors final
     {

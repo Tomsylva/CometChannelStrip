@@ -39,7 +39,7 @@ namespace ClipperParameters
     };
 }
 
-namespace viator::dsp
+namespace viator
 {
     class ClipperProcessBlock {
     public:

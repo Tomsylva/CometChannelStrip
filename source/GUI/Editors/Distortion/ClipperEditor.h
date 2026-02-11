@@ -8,12 +8,12 @@
 #include "../BaseEditor.h"
 #include "../../Widgets/BaseSlider.h"
 
-namespace viator::gui::editors
+namespace viator
 {
-    class ClipperEditor : public viator::gui::editors::BaseEditor
+    class ClipperEditor : public viator::BaseEditor
     {
     public:
-        explicit ClipperEditor(viator::dsp::processors::ClipperProcessor &);
+        explicit ClipperEditor(viator::ClipperProcessor &);
 
         ~ClipperEditor() override;
 
@@ -23,16 +23,16 @@ namespace viator::gui::editors
         void resized() override;
 
     private:
-        viator::dsp::processors::ClipperProcessor &processorRef;
+        ClipperProcessor &processorRef;
 
-        viator::gui::widgets::BaseSlider m_drive_slider;
+        BaseSlider m_drive_slider;
         std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> m_drive_attach;
 
         juce::ComboBox m_clipper_type_menu;
         std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> m_clipper_type_attach;
         void setComboBoxProps(juce::ComboBox& box, const juce::StringArray& items);
 
-        viator::laf::DialLAF m_dial_laf;
-        viator::gui::laf::MenuLAF m_menu_laf;
+        viator::DialLAF m_dial_laf;
+        viator::MenuLAF m_menu_laf;
     };
 }

@@ -4,7 +4,7 @@
 
 #include "BaseSlider.h"
 
-namespace viator::gui::widgets
+namespace viator
 {
     BaseSlider::BaseSlider()
     {

@@ -4,10 +4,10 @@
 
 #include "../Distortion/ClipperEditor.h"
 
-namespace viator::gui::editors
+namespace viator
 {
-    ClipperEditor::ClipperEditor(viator::dsp::processors::ClipperProcessor &p)
-            : viator::gui::editors::BaseEditor(p), processorRef(p)
+    ClipperEditor::ClipperEditor(viator::ClipperProcessor &p)
+            : viator::BaseEditor(p), processorRef(p)
     {
         juce::ignoreUnused(processorRef);
 
@@ -83,9 +83,9 @@ namespace viator::gui::editors
         box.setSelectedId(1, juce::dontSendNotification);
         box.setLookAndFeel(&m_menu_laf);
         box.setColour(juce::ComboBox::ColourIds::outlineColourId, juce::Colours::transparentBlack);
-        box.setColour(juce::ComboBox::ColourIds::backgroundColourId, viator::gui_utils::Colors::editor_minor_bg_color());
+        box.setColour(juce::ComboBox::ColourIds::backgroundColourId, viator::Colors::editor_minor_bg_color());
         box.getLookAndFeel().setColour(juce::PopupMenu::ColourIds::backgroundColourId,
-                                       viator::gui_utils::Colors::editor_minor_bg_color());
+                                       viator::Colors::editor_minor_bg_color());
         addAndMakeVisible(box);
     }
 }

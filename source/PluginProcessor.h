@@ -50,16 +50,16 @@ public:
 
     juce::AudioProcessorValueTreeState& getTreeState() { return m_tree_state; }
 
-    void addProcessor(viator::dsp::processors::ProcessorType type);
+    void addProcessor(viator::ProcessorType type);
     void swapProcessors(const int a, const int b);
     void removeProcessor(const int index);
-    viator::dsp::processors::BaseProcessor* getProcessor(int index);
+    viator::BaseProcessor* getProcessor(int index);
 
-    std::vector<std::unique_ptr<viator::dsp::processors::BaseProcessor>>& getProcessors() { return m_processors; }
+    std::vector<std::unique_ptr<viator::BaseProcessor>>& getProcessors() { return m_processors; }
 
     std::atomic<bool> m_adding_processor {false};
 
-    viator::engine::MacroMap& getMacroMap() { return m_macro_map; }
+    viator::MacroMap& getMacroMap() { return m_macro_map; }
 private:
 
     juce::AudioProcessorValueTreeState m_tree_state;
@@ -70,11 +70,11 @@ private:
 
     std::unique_ptr<viator::parameters::parameters> m_parameters;
 
-    std::vector<std::unique_ptr<viator::dsp::processors::BaseProcessor>> m_processors;
+    std::vector<std::unique_ptr<viator::BaseProcessor>> m_processors;
 
     juce::CriticalSection m_processor_lock;
 
-    viator::engine::MacroMap m_macro_map;
+    viator::MacroMap m_macro_map;
 
     bool m_can_process { false };
     //==============================================================================

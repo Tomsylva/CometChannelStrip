@@ -5,7 +5,7 @@
 #pragma once
 #include <juce_gui_basics/juce_gui_basics.h>
 
-namespace viator::gui::widgets
+namespace viator
 {
 class BaseSlider : public juce::Slider, public juce::ChangeBroadcaster
     {

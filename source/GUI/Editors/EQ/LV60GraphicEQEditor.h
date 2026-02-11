@@ -26,7 +26,7 @@ public:
         const auto line_height = m_draw_bottom_line ? _height : _height / 2;
         const auto _y = m_draw_top_line ? 0 : _height / 2;
 
-        g.setColour(viator::gui_utils::Colors::graphic_slider_blue());
+        g.setColour(viator::Colors::graphic_slider_blue());
         g.drawLine(line_x, _y, line_x, line_height, 2.0f);
 
         line_x = static_cast<float>(slider.getLocalBounds().getWidth()) * 0.3f;
@@ -83,11 +83,11 @@ private:
     bool m_draw_bottom_line {true};
 };
 
-namespace viator::gui::editors
+namespace viator
 {
-    class LV60GraphicEQEditor : public viator::gui::editors::BaseEditor {
+    class LV60GraphicEQEditor : public viator::BaseEditor {
     public:
-        explicit LV60GraphicEQEditor(viator::dsp::processors::LV60GraphicEQProcessor &);
+        explicit LV60GraphicEQEditor(viator::LV60GraphicEQProcessor &);
 
         ~LV60GraphicEQEditor() override;
 
@@ -103,11 +103,11 @@ namespace viator::gui::editors
         };
 
     private:
-        viator::dsp::processors::LV60GraphicEQProcessor &processorRef;
+        viator::LV60GraphicEQProcessor &processorRef;
 
         void setComboBoxProps(juce::ComboBox &box, const juce::StringArray &items);
 
-        std::array<viator::gui::widgets::BaseSlider, Sliders::num_sliders> m_main_sliders;
+        std::array<BaseSlider, Sliders::num_sliders> m_main_sliders;
         std::array<juce::Label, 10> m_gain_labels;
         std::vector<std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> > main_slider_attaches;
         std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> m_hp_attach, m_lp_attach, m_drive_attach;
@@ -123,8 +123,8 @@ namespace viator::gui::editors
             "16 kHz", "8 kHz", "4 kHz", "2 kHz", "1 kHz", "500 Hz", "250 Hz", "125 Hz", "63 Hz", "31 Hz"
         };
 
-        viator::laf::DialLAF m_dial_laf;
-        viator::gui::laf::MenuLAF m_menu_laf;
+        viator::DialLAF m_dial_laf;
+        viator::MenuLAF m_menu_laf;
         SliderLAF m_slider_laf {true, true};
         SliderLAF m_slider_laf_no_top {false, true};
         SliderLAF m_slider_laf_no_bottom {true, false};

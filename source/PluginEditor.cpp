@@ -64,9 +64,9 @@ void AudioPluginAudioProcessorEditor::paint(juce::Graphics &g)
     const auto bounds = getLocalBounds();
 
     juce::ColourGradient faceGrad(
-        viator::gui_utils::Colors::main_bg().brighter(0.05f),
+        viator::Colors::main_bg().brighter(0.05f),
         bounds.getX() + bounds.getWidth() * 0.25f, bounds.getY() + bounds.getHeight() * 0.20f,
-        viator::gui_utils::Colors::main_bg().darker(0.05f),
+        viator::Colors::main_bg().darker(0.05f),
         bounds.getRight() - bounds.getWidth() * 0.15f, bounds.getBottom() - bounds.getHeight() * 0.10f,
         true
     );
@@ -76,7 +76,7 @@ void AudioPluginAudioProcessorEditor::paint(juce::Graphics &g)
 
     // header
     auto line = static_cast<float>(getHeight()) * 0.08f;
-    g.setColour(viator::gui_utils::Colors::light_bg());
+    g.setColour(viator::Colors::light_bg());
     g.drawLine(0, line, static_cast<float>(getWidth()), line, 1.0f);
 
     // footer
@@ -143,7 +143,7 @@ void AudioPluginAudioProcessorEditor::initMacroKnobs()
         m_macro_knobs[i].addMouseListener(this, true);
         m_macro_knobs[i].setColour(juce::Slider::ColourIds::thumbColourId, juce::Colours::transparentWhite);
         m_macro_knobs[i].setColour(juce::Slider::ColourIds::rotarySliderFillColourId, juce::Colour(234, 234, 234));
-        m_macro_knobs[i].setColour(juce::Slider::ColourIds::rotarySliderOutlineColourId, viator::gui_utils::Colors::dial_bg());
+        m_macro_knobs[i].setColour(juce::Slider::ColourIds::rotarySliderOutlineColourId, viator::Colors::dial_bg());
         m_macro_knobs[i].setLookAndFeel(&m_macro_laf);
         m_macro_attaches.emplace_back(
                 std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef
@@ -156,7 +156,7 @@ void AudioPluginAudioProcessorEditor::initMacroKnobs()
 
 void AudioPluginAudioProcessorEditor::changeListenerCallback(juce::ChangeBroadcaster *source)
 {
-    if (auto slider = dynamic_cast<viator::gui::widgets::BaseSlider *>(source))
+    if (auto slider = dynamic_cast<viator::BaseSlider *>(source))
     {
         const auto slider_id_to_map = slider->getComponentID();
         const auto is_mapped = slider->getIsMapped();
@@ -182,7 +182,7 @@ void AudioPluginAudioProcessorEditor::actionListenerCallback(const juce::String 
     {
         for (auto &editor: m_rack.getEditors())
         {
-            if (auto *base_editor = dynamic_cast<viator::gui::editors::BaseEditor *>(editor.get()))
+            if (auto *base_editor = dynamic_cast<viator::BaseEditor *>(editor.get()))
             {
                 for (auto &slider: base_editor->getSliders())
                 {
@@ -205,7 +205,7 @@ void AudioPluginAudioProcessorEditor::mouseDown(const juce::MouseEvent &event)
 {
     if (event.mods.isRightButtonDown())
     {
-        if (auto *macro_slider = dynamic_cast<viator::gui::widgets::MacroSlider *>(event.eventComponent))
+        if (auto *macro_slider = dynamic_cast<viator::MacroSlider *>(event.eventComponent))
         {
             for (auto &macro: m_macro_knobs)
             {
@@ -221,7 +221,7 @@ void AudioPluginAudioProcessorEditor::mouseDown(const juce::MouseEvent &event)
 
             for (auto &editor: m_rack.getEditors())
             {
-                if (auto *base_editor = dynamic_cast<viator::gui::editors::BaseEditor *>(editor.get()))
+                if (auto *base_editor = dynamic_cast<viator::BaseEditor *>(editor.get()))
                 {
                     for (auto &slider: base_editor->getSliders())
                     {
@@ -240,7 +240,7 @@ void AudioPluginAudioProcessorEditor::refreshMacroMappings()
 {
     for (auto& editor : m_rack.getEditors())
     {
-        if (auto* base_editor = dynamic_cast<viator::gui::editors::BaseEditor*>(editor.get()))
+        if (auto* base_editor = dynamic_cast<viator::BaseEditor*>(editor.get()))
         {
             for (auto* slider : base_editor->getSliders())
             {

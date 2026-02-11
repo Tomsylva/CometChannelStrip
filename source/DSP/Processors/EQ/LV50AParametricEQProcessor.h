@@ -8,10 +8,10 @@
 #include "../BaseProcessor.h"
 #include "LV50AParametricEQProcessBlock.h"
 
-namespace viator::dsp::processors
+namespace viator
 {
     class LV50AParametricEQProcessor
-            : public viator::dsp::processors::BaseProcessor, public juce::AudioProcessorValueTreeState::Listener {
+            : public viator::BaseProcessor, public juce::AudioProcessorValueTreeState::Listener {
     public:
         //==============================================================================
         explicit LV50AParametricEQProcessor(int id);
@@ -69,7 +69,7 @@ namespace viator::dsp::processors
 
         void updateParameters();
 
-        std::array<viator::dsp::LV50AParametricEQProcessBlock, 5> m_process_blocks;
+        std::array<viator::LV50AParametricEQProcessBlock, 5> m_process_blocks;
 
         std::array<juce::SmoothedValue<float>, 2> m_mutes;
         juce::AudioBuffer<float> m_dry_buffer;

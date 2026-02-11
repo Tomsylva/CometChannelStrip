@@ -15,8 +15,8 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
     m_parameters = std::make_unique<viator::parameters::parameters>(m_tree_state);
 
     m_processors.clear();
-    //addProcessor(viator::dsp::processors::ProcessorType::kClipper);
-    //addProcessor(viator::dsp::processors::ProcessorType::kClipper);
+    //addProcessor(viator::ProcessorType::kClipper);
+    //addProcessor(viator::ProcessorType::kClipper);
 
     for (int i = 0; i < 10; ++i)
     {
@@ -134,7 +134,7 @@ void AudioPluginAudioProcessor::parameterChanged(const juce::String &parameterID
 {
     for (const auto &processor: m_processors)
     {
-        if (const auto *module_processor = dynamic_cast<viator::dsp::processors::BaseProcessor *>(processor.get()))
+        if (const auto *module_processor = dynamic_cast<viator::BaseProcessor *>(processor.get()))
         {
             auto &tree = module_processor->getTreeState();
             if (auto *param = m_tree_state.getParameter(parameterID))
@@ -223,12 +223,12 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     }
 }
 
-void AudioPluginAudioProcessor::addProcessor(viator::dsp::processors::ProcessorType type)
+void AudioPluginAudioProcessor::addProcessor(viator::ProcessorType type)
 {
     const juce::ScopedLock lock (m_processor_lock);
 
     const int index = static_cast<int>(m_processors.size());
-    auto processor = viator::dsp::processors::createProcessorByType(type, index);
+    auto processor = viator::createProcessorByType(type, index);
 
     if (processor)
     {
@@ -262,7 +262,7 @@ void AudioPluginAudioProcessor::removeProcessor(const int index)
     }
 }
 
-viator::dsp::processors::BaseProcessor* AudioPluginAudioProcessor::getProcessor(int index)
+viator::BaseProcessor* AudioPluginAudioProcessor::getProcessor(int index)
 {
     const juce::ScopedLock lock (m_processor_lock);
 
@@ -305,7 +305,7 @@ void AudioPluginAudioProcessor::getStateInformation (juce::MemoryBlock& destData
         {
             juce::ValueTree wrapper("Processor");
 
-            const auto &registry = viator::dsp::processors::getProcessorRegistry();
+            const auto &registry = viator::getProcessorRegistry();
             for (const auto &def: registry)
             {
                 const auto processor_name = processor->getName();
@@ -384,7 +384,7 @@ void AudioPluginAudioProcessor::setStateInformation (const void* data, int sizeI
             continue;
 
         auto processorTree = wrapper.getChild(0);
-        auto processorType = viator::dsp::processors::processorTypeFromString(typeStr);
+        auto processorType = viator::processorTypeFromString(typeStr);
 
         auto processor = createProcessorByType(processorType, index);
         if (processor != nullptr)

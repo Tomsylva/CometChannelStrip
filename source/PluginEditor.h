@@ -30,26 +30,28 @@ private:
 
     void setComboBoxProps(juce::ComboBox &box, const juce::StringArray &items);
 
-    viator::gui::views::EditorRack m_rack;
+    viator::EditorRack m_rack;
 
-    std::array<viator::gui::widgets::MacroSlider, 10> m_macro_knobs;
+    std::array<viator::MacroSlider, 10> m_macro_knobs;
     std::vector<std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>> m_macro_attaches;
 
     void initMacroKnobs();
-    viator::laf::MacroLAF m_macro_laf {2};
+    viator::MacroLAF m_macro_laf {2};
     //RoundedBackdrop m_macro_bg;
 
     void changeListenerCallback(juce::ChangeBroadcaster *source) override;
 
     void actionListenerCallback(const juce::String &message) override;
 
-    void mouseDown(const juce::MouseEvent &event);
+    void mouseDown(const juce::MouseEvent &event) override;
 
-    viator::gui::widgets::MacroSlider *m_macro_slider{nullptr};
+    viator::MacroSlider *m_macro_slider{nullptr};
 
     void refreshMacroMappings();
 
     juce::Viewport m_view_port;
+
+    viator::Images m_images;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessorEditor)
 };

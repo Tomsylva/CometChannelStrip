@@ -13,7 +13,7 @@ namespace viator
         const auto W = static_cast<float>(getWidth());
         const auto H = static_cast<float>(getHeight());
 
-        g.fillAll(viator::gui_utils::Colors::light_bg());
+        g.fillAll(viator::Colors::light_bg());
 
         const float greenW  = W * 0.6f;
         const float yellowW = W * 0.25f;
@@ -53,9 +53,9 @@ namespace viator
             remainingW -= w;
         };
 
-        drawSeg(gui_utils::Colors::meter_green(),  greenW);
-        drawSeg(gui_utils::Colors::meter_yellow(), yellowW);
-        drawSeg(gui_utils::Colors::meter_red(),    redW);
+        drawSeg(Colors::meter_green(),  greenW);
+        drawSeg(Colors::meter_yellow(), yellowW);
+        drawSeg(Colors::meter_red(),    redW);
     }
 
     void LevelMeter::setLevel(const float newLevel)

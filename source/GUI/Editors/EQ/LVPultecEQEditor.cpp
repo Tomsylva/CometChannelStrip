@@ -4,10 +4,10 @@
 
 #include "LVPultecEQEditor.h"
 
-namespace viator::gui::editors
+namespace viator
 {
-    LVPultecEQEditor::LVPultecEQEditor(viator::dsp::processors::LVPultecEQProcessor &p)
-        : viator::gui::editors::BaseEditor(p), processorRef(p)
+    LVPultecEQEditor::LVPultecEQEditor(viator::LVPultecEQProcessor &p)
+        : viator::BaseEditor(p), processorRef(p)
     {
         juce::ignoreUnused(processorRef);
         const auto id = juce::String(processorRef.getProcessorID());
@@ -27,7 +27,7 @@ namespace viator::gui::editors
 
         for (int i = 0; i < num_sliders; ++i)
         {
-            LVPultecEQEditor::setSliderProps(m_main_sliders[i]);
+            LVPultecEQEditor::setDialProps(m_main_sliders[i]);
             m_main_sliders[i].setComponentID(ids[i] + id);
             m_main_sliders[i].setName(names[i]);
             getSliders().push_back(&m_main_sliders[i]);
@@ -48,17 +48,17 @@ namespace viator::gui::editors
         m_main_sliders[kDrive].setTextValueSuffix(" dB");
         m_main_sliders[kLP].setTextValueSuffix(" Hz");
 
-        m_main_sliders[kLowFreq].setColour(juce::Slider::ColourIds::rotarySliderOutlineColourId, gui_utils::Colors::dial_bg());
-        m_main_sliders[kHighFreq].setColour(juce::Slider::ColourIds::rotarySliderOutlineColourId, gui_utils::Colors::dial_bg());
-        m_main_sliders[kHighAttenSel].setColour(juce::Slider::ColourIds::rotarySliderOutlineColourId, gui_utils::Colors::dial_bg());
+        m_main_sliders[kLowFreq].setColour(juce::Slider::ColourIds::rotarySliderOutlineColourId, Colors::dial_bg());
+        m_main_sliders[kHighFreq].setColour(juce::Slider::ColourIds::rotarySliderOutlineColourId, Colors::dial_bg());
+        m_main_sliders[kHighAttenSel].setColour(juce::Slider::ColourIds::rotarySliderOutlineColourId, Colors::dial_bg());
 
-        m_main_sliders[kLowFreq].setColour(juce::Slider::ColourIds::backgroundColourId, gui_utils::Colors::pultec_dial());
-        m_main_sliders[kHighFreq].setColour(juce::Slider::ColourIds::backgroundColourId, gui_utils::Colors::pultec_dial());
-        m_main_sliders[kHighAttenSel].setColour(juce::Slider::ColourIds::backgroundColourId, gui_utils::Colors::pultec_dial());
+        m_main_sliders[kLowFreq].setColour(juce::Slider::ColourIds::backgroundColourId, Colors::pultec_dial());
+        m_main_sliders[kHighFreq].setColour(juce::Slider::ColourIds::backgroundColourId, Colors::pultec_dial());
+        m_main_sliders[kHighAttenSel].setColour(juce::Slider::ColourIds::backgroundColourId, Colors::pultec_dial());
 
-        m_main_sliders[kHP].setColour(juce::Slider::ColourIds::backgroundColourId, gui_utils::Colors::eq_footer_dials());
-        m_main_sliders[kDrive].setColour(juce::Slider::ColourIds::backgroundColourId, gui_utils::Colors::eq_footer_dials());
-        m_main_sliders[kLP].setColour(juce::Slider::ColourIds::backgroundColourId, gui_utils::Colors::eq_footer_dials());
+        m_main_sliders[kHP].setColour(juce::Slider::ColourIds::backgroundColourId, Colors::eq_footer_dials());
+        m_main_sliders[kDrive].setColour(juce::Slider::ColourIds::backgroundColourId, Colors::eq_footer_dials());
+        m_main_sliders[kLP].setColour(juce::Slider::ColourIds::backgroundColourId, Colors::eq_footer_dials());
 
         m_main_sliders[kLowFreq].setLookAndFeel(&m_rect_dial_laf);
         m_main_sliders[kHighFreq].setLookAndFeel(&m_rect_dial_laf);
@@ -86,7 +86,7 @@ namespace viator::gui::editors
         const auto y = juce::roundToInt(getHeight() * 0.325);
         const auto font_size = static_cast<float>(getHeight()) * 0.027f;
         g.setColour(juce::Colour(120, 185, 181));
-        g.setFont(gui_utils::Fonts::bold(font_size));
+        g.setFont(Fonts::bold(font_size));
         g.drawFittedText(text, x, y, getWidth() / 2, getHeight() / 10, juce::Justification::centred, 2);
     }
 
@@ -127,14 +127,14 @@ namespace viator::gui::editors
         BaseEditor::resized();
     }
 
-    void LVPultecEQEditor::setSliderProps(juce::Slider &slider)
+    void LVPultecEQEditor::setDialProps(juce::Slider &slider)
     {
         slider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
         slider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
         slider.setColour(juce::Slider::ColourIds::rotarySliderOutlineColourId, juce::Colour(215, 215, 215).withAlpha(0.85f));
         slider.setColour(juce::Slider::ColourIds::trackColourId, juce::Colours::whitesmoke);
         slider.setColour(juce::Slider::ColourIds::rotarySliderFillColourId, juce::Colour(211, 218, 217));
-        slider.setColour(juce::Slider::ColourIds::backgroundColourId, gui_utils::Colors::pultec_dial());
+        slider.setColour(juce::Slider::ColourIds::backgroundColourId, Colors::pultec_dial());
         slider.setLookAndFeel(&m_dial_laf);
 
         addAndMakeVisible(slider);
@@ -153,9 +153,9 @@ namespace viator::gui::editors
         box.setSelectedId(1, juce::dontSendNotification);
         box.setLookAndFeel(&m_menu_laf);
         box.setColour(juce::ComboBox::ColourIds::outlineColourId, juce::Colours::transparentBlack);
-        box.setColour(juce::ComboBox::ColourIds::backgroundColourId, viator::gui_utils::Colors::editor_minor_bg_color());
+        box.setColour(juce::ComboBox::ColourIds::backgroundColourId, viator::Colors::editor_minor_bg_color());
         box.getLookAndFeel().setColour(juce::PopupMenu::ColourIds::backgroundColourId,
-                                       viator::gui_utils::Colors::editor_minor_bg_color());
+                                       viator::Colors::editor_minor_bg_color());
         addAndMakeVisible(box);
     }
 }

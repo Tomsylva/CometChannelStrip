@@ -11,7 +11,7 @@
 
 class AudioPluginAudioProcessor;
 
-namespace viator::gui::views
+namespace viator
 {
     class EditorRack
             : public juce::Component, public juce::ActionBroadcaster, public juce::ActionListener
@@ -61,6 +61,6 @@ namespace viator::gui::views
 
         std::unique_ptr<juce::DropShadower> m_drop_shadow;
 
-        viator::laf::SelectorLAF m_selector_laf;
+        viator::SelectorLAF m_selector_laf;
     };
 }

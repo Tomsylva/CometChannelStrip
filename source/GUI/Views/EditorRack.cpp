@@ -5,7 +5,7 @@
 #include "EditorRack.h"
 #include "../../PluginProcessor.h"
 
-namespace viator::gui::views
+namespace viator
 {
     EditorRack::EditorRack(AudioPluginAudioProcessor &p) : processorRef(p)
     {
@@ -27,7 +27,7 @@ namespace viator::gui::views
         m_plugin_selector.onChange = [this]()
         {
             const auto selectedId = m_plugin_selector.getSelectedId();
-            const auto &registry = viator::dsp::processors::getProcessorRegistry();
+            const auto &registry = viator::getProcessorRegistry();
 
             auto it = std::find_if(registry.begin(), registry.end(),
                                    [selectedId, this](const auto &def)
@@ -48,7 +48,7 @@ namespace viator::gui::views
 
         for (const auto& editor : m_editors)
         {
-            if (auto *base = dynamic_cast<viator::gui::editors::BaseEditor *>(editor.get()))
+            if (auto *base = dynamic_cast<viator::BaseEditor *>(editor.get()))
             {
                 base->removeActionListener(this);
             }
@@ -89,12 +89,12 @@ namespace viator::gui::views
 
         if (auto *processor = processorRef.getProcessor(index))
         {
-            auto editor = viator::dsp::processors::createEditorForProcessor(processor);
+            auto editor = viator::createEditorForProcessor(processor);
             if (editor)
             {
                 editor->addMouseListener(this, false);
 
-                if (auto *base = dynamic_cast<viator::gui::editors::BaseEditor *>(editor.get()))
+                if (auto *base = dynamic_cast<viator::BaseEditor *>(editor.get()))
                 {
                     base->addActionListener(this);
                 }
@@ -120,13 +120,13 @@ namespace viator::gui::views
         {
             if (auto *processor = processorRef.getProcessor(i))
             {
-                auto editor = viator::dsp::processors::createEditorForProcessor(processor);
+                auto editor = viator::createEditorForProcessor(processor);
                 if (editor)
                 {
 
                     editor->addMouseListener(this, false);
 
-                    if (auto *base = dynamic_cast<viator::gui::editors::BaseEditor *>(editor.get()))
+                    if (auto *base = dynamic_cast<viator::BaseEditor *>(editor.get()))
                     {
                         base->addActionListener(this);
                     }
@@ -244,7 +244,7 @@ namespace viator::gui::views
     {
         std::map<juce::String, juce::PopupMenu> categories;
 
-        for (const auto &def: viator::dsp::processors::getProcessorRegistry())
+        for (const auto &def: viator::getProcessorRegistry())
         {
             categories[def.category].addItem(
                     juce::PopupMenu::Item(def.name)

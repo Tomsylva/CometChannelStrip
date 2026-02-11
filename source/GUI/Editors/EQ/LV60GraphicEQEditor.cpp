@@ -4,10 +4,10 @@
 
 #include "LV60GraphicEQEditor.h"
 
-namespace viator::gui::editors
+namespace viator
 {
-    LV60GraphicEQEditor::LV60GraphicEQEditor(viator::dsp::processors::LV60GraphicEQProcessor &p)
-            : viator::gui::editors::BaseEditor(p), processorRef(p)
+    LV60GraphicEQEditor::LV60GraphicEQEditor(viator::LV60GraphicEQProcessor &p)
+            : viator::BaseEditor(p), processorRef(p)
     {
         juce::ignoreUnused(processorRef);
         const auto id = juce::String(processorRef.getProcessorID());
@@ -53,9 +53,9 @@ namespace viator::gui::editors
         m_main_sliders[kLP].setName("LP");
         m_main_sliders[kDrive].setName("Drive");
 
-        m_main_sliders[kLP].setColour(juce::Slider::ColourIds::backgroundColourId, gui_utils::Colors::eq_footer_dials());
-        m_main_sliders[kHP].setColour(juce::Slider::ColourIds::backgroundColourId, gui_utils::Colors::eq_footer_dials());
-        m_main_sliders[kDrive].setColour(juce::Slider::ColourIds::backgroundColourId, gui_utils::Colors::eq_footer_dials());
+        m_main_sliders[kLP].setColour(juce::Slider::ColourIds::backgroundColourId, Colors::eq_footer_dials());
+        m_main_sliders[kHP].setColour(juce::Slider::ColourIds::backgroundColourId, Colors::eq_footer_dials());
+        m_main_sliders[kDrive].setColour(juce::Slider::ColourIds::backgroundColourId, Colors::eq_footer_dials());
 
         setSize(1000, 600);
     }
@@ -78,8 +78,8 @@ namespace viator::gui::editors
         constexpr auto x = 2;
         const auto y = juce::roundToInt(getHeight() * 0.84);
         const auto font_size = static_cast<float>(getHeight()) * 0.027f;
-        g.setColour(gui_utils::Colors::graphic_slider_blue());
-        g.setFont(gui_utils::Fonts::bold(font_size));
+        g.setColour(Colors::graphic_slider_blue());
+        g.setFont(Fonts::bold(font_size));
         g.drawFittedText(text, x, y, getWidth() / 2, getHeight() / 10, juce::Justification::centredLeft, {});
     }
 
@@ -94,7 +94,7 @@ namespace viator::gui::editors
         for (int i = 0; i < m_gain_labels.size(); ++i)
         {
             m_gain_labels[i].setBounds(0, y, label_width, height);
-            m_gain_labels[i].setFont(viator::gui_utils::Fonts::regular(font_size));
+            m_gain_labels[i].setFont(viator::Fonts::regular(font_size));
             m_main_sliders[i].setBounds(m_gain_labels[i].getRight(), y, width, height);
             y += height;
         }
@@ -151,9 +151,9 @@ namespace viator::gui::editors
         box.setSelectedId(1, juce::dontSendNotification);
         box.setLookAndFeel(&m_menu_laf);
         box.setColour(juce::ComboBox::ColourIds::outlineColourId, juce::Colours::transparentBlack);
-        box.setColour(juce::ComboBox::ColourIds::backgroundColourId, viator::gui_utils::Colors::editor_minor_bg_color());
+        box.setColour(juce::ComboBox::ColourIds::backgroundColourId, viator::Colors::editor_minor_bg_color());
         box.getLookAndFeel().setColour(juce::PopupMenu::ColourIds::backgroundColourId,
-                                       viator::gui_utils::Colors::editor_minor_bg_color());
+                                       viator::Colors::editor_minor_bg_color());
         addAndMakeVisible(box);
     }
 }

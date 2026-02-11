@@ -50,7 +50,7 @@ private:
     int shadow_radius = 5;
     juce::Point<int> shadow_offset { 0, 2 };
 
-    juce::Colour fill_colour   = viator::gui_utils::Colors::main_bg();
-    juce::Colour outline_colour = viator::gui_utils::Colors::light_bg();
+    juce::Colour fill_colour   = viator::Colors::main_bg();
+    juce::Colour outline_colour = viator::Colors::light_bg();
     juce::Colour shadow_colour  = juce::Colour(0, 0, 0);
 };

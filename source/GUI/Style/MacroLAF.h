@@ -6,7 +6,7 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include "Fonts.h"
 
-namespace viator::laf
+namespace viator
 {
     class MacroLAF final : public juce::LookAndFeel_V4
     {
@@ -67,7 +67,7 @@ namespace viator::laf
 
             const auto text = slider.isMouseOverOrDragging() ? juce::String(slider.getValue(), m_num_decimals) : slider.getName();
             g.setColour(juce::Colours::whitesmoke);
-            g.setFont(gui_utils::Fonts::bold(static_cast<float>(width) * 0.16f));
+            g.setFont(Fonts::bold(static_cast<float>(width) * 0.16f));
             g.drawFittedText(text, x, y, width, height, juce::Justification::centred, 2);
         }
 

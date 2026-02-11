@@ -5,7 +5,7 @@
 #pragma once
 #include "Fonts.h"
 
-namespace viator::laf
+namespace viator
 {
     class SelectorLAF final : public juce::LookAndFeel_V4
     {
@@ -20,7 +20,7 @@ namespace viator::laf
             auto baseColour = box.findColour (juce::ComboBox::backgroundColourId).withMultipliedSaturation(2.0f).withMultipliedAlpha(1.0f);
 
             if (box.isMouseOverOrDragging())
-                baseColour = gui_utils::Colors::light_bg().withAlpha(0.5f);
+                baseColour = Colors::light_bg().withAlpha(0.5f);
 
             g.setColour (baseColour);
             g.fillRoundedRectangle (boxBounds.toFloat(), cornerSize);
@@ -28,7 +28,7 @@ namespace viator::laf
             g.setColour (box.findColour (juce::ComboBox::outlineColourId));
             g.drawRoundedRectangle (boxBounds.toFloat().reduced (0.5f, 0.5f), cornerSize, 1.0f);
 
-            g.setColour (gui_utils::Colors::text());
+            g.setColour (Colors::text());
             g.setFont(getComboBoxFont(box));
             const auto text = "Add Plugin Module";
             g.drawFittedText(text, 0, 0, width, height, juce::Justification::centred, 1);
@@ -36,7 +36,7 @@ namespace viator::laf
 
         juce::Font getComboBoxFont(juce::ComboBox &box) override
         {
-            return gui_utils::Fonts::regular(16.0f);
+            return Fonts::regular(16.0f);
         }
 
         void positionComboBoxText (juce::ComboBox& box, juce::Label& label) override

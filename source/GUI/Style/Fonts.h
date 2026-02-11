@@ -7,7 +7,7 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include "BinaryData.h"
 
-namespace viator::gui_utils
+namespace viator
 {
     class Fonts final
     {

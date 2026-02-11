@@ -6,7 +6,7 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include "Images.h"
 
-namespace viator::laf
+namespace viator
 {
     class ButtonLAF : public juce::LookAndFeel_V4 {
     public:
@@ -111,19 +111,6 @@ namespace viator::laf
 
                 g.restoreState();
             }
-
-            gui::Images::tube_icon()->replaceColour(juce::Colours::black, juce::Colours::whitesmoke);
-            if (isOn)
-            {
-                gui::Images::tube_icon()->replaceColour(juce::Colours::whitesmoke, juce::Colour(128, 195, 255));
-            } else
-            {
-                gui::Images::tube_icon()->replaceColour(juce::Colour(128, 195, 255), juce::Colours::whitesmoke);
-            }
-
-            const auto image_size = button.getHeight() * 0.5;
-            gui::Images::tube_icon()->drawWithin(g, r.withSizeKeepingCentre(image_size / 2, image_size),
-                juce::RectanglePlacement::stretchToFit, 1.0f);
         }
 
         void drawButtonText(juce::Graphics &g,

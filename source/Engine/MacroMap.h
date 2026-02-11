@@ -7,7 +7,7 @@
 #include <juce_core/juce_core.h>
 #include "../GUI/Widgets/MacroSlider.h"
 
-namespace viator::engine
+namespace viator
 {
     class MacroMap
     {

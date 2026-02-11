@@ -2,7 +2,7 @@
 #include "../../../GUI/Editors/EQ/LV50AParametricEQEditor.h"
 #include "Globals/Globals.h"
 
-namespace viator::dsp::processors
+namespace viator
 {
     //==============================================================================
     LV50AParametricEQProcessor::LV50AParametricEQProcessor(int id)
@@ -264,6 +264,6 @@ namespace viator::dsp::processors
 
     juce::AudioProcessorEditor *LV50AParametricEQProcessor::createEditor()
     {
-        return new viator::gui::editors::LV50AParametricEQEditor(*this);
+        return new viator::LV50AParametricEQEditor(*this);
     }
 }

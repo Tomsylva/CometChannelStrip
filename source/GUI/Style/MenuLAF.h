@@ -6,7 +6,7 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include "Fonts.h"
 
-namespace viator::gui::laf
+namespace viator
 {
     class MenuLAF final : public juce::LookAndFeel_V4
     {
@@ -21,7 +21,7 @@ namespace viator::gui::laf
             auto baseColour = box.findColour (juce::ComboBox::backgroundColourId).withMultipliedSaturation(2.0f).withMultipliedAlpha(1.0f);
 
             if (box.isMouseOverOrDragging())
-                baseColour = gui_utils::Colors::light_bg().withAlpha(0.5f);
+                baseColour = Colors::light_bg().withAlpha(0.5f);
 
             g.setColour (baseColour);
             g.fillRoundedRectangle (boxBounds.toFloat(), cornerSize);
@@ -46,7 +46,7 @@ namespace viator::gui::laf
         juce::Font getComboBoxFont(juce::ComboBox &box) override
         {
             const auto font_size = static_cast<float>(box.getHeight()) * 0.5f;
-            return viator::gui_utils::Fonts::regular(font_size);
+            return viator::Fonts::regular(font_size);
         }
 
         void positionComboBoxText (juce::ComboBox& box, juce::Label& label) override

@@ -7,7 +7,7 @@
 #include "Fonts.h"
 #include "Colors.h"
 
-namespace viator::laf
+namespace viator
 {
     class KnobUtils
     {
@@ -22,9 +22,9 @@ namespace viator::laf
             constexpr float startAngle = juce::MathConstants<float>::pi * 1.25f;
             constexpr float endAngle = juce::MathConstants<float>::pi * 2.75f;
 
-            g.setColour(gui_utils::Colors::text());
+            g.setColour(Colors::text());
             constexpr auto font_size = 10.0f;
-            const auto font = gui_utils::Fonts::bold(font_size);
+            const auto font = Fonts::bold(font_size);
             g.setFont(font);
 
             if (slider.getName() != "Type") {
@@ -208,7 +208,7 @@ namespace viator::laf
             }
 
             constexpr auto font_size = 10.0f;
-            const auto font = gui_utils::Fonts::bold(font_size);
+            const auto font = Fonts::bold(font_size);
             const auto suffix = slider.getTextValueSuffix();
             const auto value = slider.getValue();
 
@@ -365,7 +365,7 @@ namespace viator::laf
             }
 
             constexpr auto font_size = 10.0f;
-            const auto font = gui_utils::Fonts::bold(font_size);
+            const auto font = Fonts::bold(font_size);
             const auto suffix = slider.getTextValueSuffix();
             const auto value = slider.getValue();
 

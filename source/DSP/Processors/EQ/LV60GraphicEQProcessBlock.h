@@ -77,7 +77,7 @@ namespace LV60GraphicEQParameters
     };
 }
 
-namespace viator::dsp
+namespace viator
 {
     class LV60GraphicEQProcessBlock
     {
@@ -163,7 +163,7 @@ namespace viator::dsp
         std::array<juce::SmoothedValue<float>, 2> m_drive_smoothers;
         std::array<juce::dsp::LinkwitzRileyFilter<float>, 2> m_filters;
         static constexpr float two_pi = 2.0f * juce::MathConstants<float>::pi;
-        viator::dsp::GraphicEq<float> m_graphic_eq;
+        viator::GraphicEq<float> m_graphic_eq;
 
         void processSaturation(const juce::dsp::AudioBlock<float> &block, const int num_samples)
         {

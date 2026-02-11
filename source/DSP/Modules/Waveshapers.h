@@ -5,7 +5,7 @@
 #pragma once
 #include <juce_dsp/juce_dsp.h>
 
-namespace viator::dsp
+namespace viator
 {
     static constexpr float two_pi = 2.0f * juce::MathConstants<float>::pi;
     static constexpr float two_by_pi = 2.0f / juce::MathConstants<float>::pi;
