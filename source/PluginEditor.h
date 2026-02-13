@@ -4,7 +4,6 @@
 #include "GUI/Editors/BaseEditor.h"
 #include "GUI/Views/EditorRack.h"
 #include "GUI/Widgets/MacroSlider.h"
-#include "GUI/Widgets/Billboard.h"
 
 //==============================================================================
 class AudioPluginAudioProcessorEditor final

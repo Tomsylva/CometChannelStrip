@@ -61,6 +61,6 @@ namespace viator
     void LevelMeter::setLevel(const float newLevel)
     {
         smoothedGainReduction = newLevel;
-        repaint();
+        //repaint();
     }
 }

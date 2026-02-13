@@ -81,6 +81,7 @@ target_compile_definitions(SharedCode INTERFACE
         VERSION="${CURRENT_VERSION}"
         JUCE_DISPLAY_SPLASH_SCREEN=0
         PRODUCT_NAME_WITHOUT_VERSION="CometChannelStrip"
+        JUCE_ENABLE_REPAINT_DEBUGGING=0
 )
 
 # Add sources to the main project

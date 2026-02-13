@@ -83,8 +83,6 @@ namespace viator
 
         m_main_sliders[kDrive].setComponentID(LV50AParametricEQParameters::driveID + id);
         m_main_sliders[kDrive].setName("Drive");
-
-        setSize(1000, 600);
     }
 
     LV50AParametricEQEditor::~LV50AParametricEQEditor()

@@ -89,8 +89,6 @@ namespace viator
         m_output_meters[1].setFillDirection(LevelMeter::FillDirection::RightToLeft);
 
         startTimerHz(30);
-
-        setSize(1000, 600);
     }
 
     BaseEditor::~BaseEditor()
@@ -113,6 +111,8 @@ namespace viator
     //==============================================================================
     void BaseEditor::paint(juce::Graphics &g)
     {
+        g.fillAll(juce::Colours::black);
+
         const auto bounds = getLocalBounds();
         constexpr auto contrast = 0.2f;
         const auto center = static_cast<float>(bounds.getCentreX());

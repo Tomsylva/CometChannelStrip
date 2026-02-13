@@ -45,7 +45,7 @@ namespace viator
             kDelete
         };
 
-        void setBackgroundColor(const juce::Colour colour) { m_comp_bg = colour; repaint(); };
+        void setBackgroundColor(const juce::Colour colour) { m_comp_bg = colour; };
 
         static void drawVerticalText(juce::Graphics& g,
                       const juce::String& text,

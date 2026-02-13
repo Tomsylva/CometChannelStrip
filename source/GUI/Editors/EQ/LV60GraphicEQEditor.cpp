@@ -56,8 +56,6 @@ namespace viator
         m_main_sliders[kLP].setColour(juce::Slider::ColourIds::backgroundColourId, Colors::eq_footer_dials());
         m_main_sliders[kHP].setColour(juce::Slider::ColourIds::backgroundColourId, Colors::eq_footer_dials());
         m_main_sliders[kDrive].setColour(juce::Slider::ColourIds::backgroundColourId, Colors::eq_footer_dials());
-
-        setSize(1000, 600);
     }
 
     LV60GraphicEQEditor::~LV60GraphicEQEditor()

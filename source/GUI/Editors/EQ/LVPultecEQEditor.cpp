@@ -63,8 +63,6 @@ namespace viator
         m_main_sliders[kLowFreq].setLookAndFeel(&m_rect_dial_laf);
         m_main_sliders[kHighFreq].setLookAndFeel(&m_rect_dial_laf);
         m_main_sliders[kHighAttenSel].setLookAndFeel(&m_rect_dial_laf);
-
-        setSize(1000, 600);
     }
 
     LVPultecEQEditor::~LVPultecEQEditor()
