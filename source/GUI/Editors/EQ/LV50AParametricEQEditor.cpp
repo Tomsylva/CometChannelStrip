@@ -32,6 +32,11 @@ namespace viator
         m_main_sliders[kHP].setColour(juce::Slider::ColourIds::backgroundColourId, Colors::eq_footer_dials());
         m_main_sliders[kDrive].setColour(juce::Slider::ColourIds::backgroundColourId, Colors::eq_footer_dials());
 
+        for (auto &label: m_main_labels)
+        {
+            setLabelProps(label);
+        }
+
         for (int i = 0; i < LV50AParametricEQParameters::numBands; ++i)
         {
             main_slider_attaches.emplace_back(std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>
@@ -83,6 +88,8 @@ namespace viator
 
         m_main_sliders[kDrive].setComponentID(LV50AParametricEQParameters::driveID + id);
         m_main_sliders[kDrive].setName("Drive");
+
+        updateLabels();
 
         setSize(1000, 600);
     }
@@ -152,6 +159,13 @@ namespace viator
         addAndMakeVisible(slider);
     }
 
+    void LV50AParametricEQEditor::setLabelProps(juce::Label &label)
+    {
+        label.setJustificationType(juce::Justification::centred);
+        //label.setColour(juce::Label::outlineColourId, juce::Colours::white);
+        addAndMakeVisible(label);
+    }
+
     void LV50AParametricEQEditor::setComboBoxProps(juce::ComboBox &box, const juce::StringArray &items)
     {
         box.addItemList(items, 1);
@@ -162,5 +176,16 @@ namespace viator
         box.getLookAndFeel().setColour(juce::PopupMenu::ColourIds::backgroundColourId,
                                        viator::Colors::editor_minor_bg_color());
         addAndMakeVisible(box);
+    }
+
+    void LV50AParametricEQEditor::updateLabels()
+    {
+        for (int i = 0; i < m_main_sliders.size(); ++i)
+        {
+            const auto value = m_main_sliders[i].getValue();
+            const auto text_value = value >= 1000.0 ? juce::String(value / 1000.0f, 2) + " kHz" : juce::String(value, 2);
+            const auto text = m_main_sliders[i].isMouseOverOrDragging() ? text_value : m_main_sliders[i].getName();
+            m_main_labels[i].setText(text, juce::dontSendNotification);
+        }
     }
 }

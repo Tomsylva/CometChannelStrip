@@ -26,6 +26,8 @@ namespace viator
         {
             sendActionMessage(viator::globals::ActionCommands::macroToggled);
         }
+
+        juce::Slider::mouseDown(event);
     }
 
     void MacroSlider::toggleMacroState()

@@ -184,8 +184,8 @@ namespace viator
                 for (size_t sample = 0; sample < block.getNumSamples(); ++sample) {
                     const float xn = data[sample];
                     const float drive = m_drive_smoothers[channel].getNextValue();
-                    const float yn = xn + (drive / two_pi) * std::sin(xn * two_pi);
-                    data[sample] = yn;
+                    const float yn = xn + (1.0f / two_pi) * std::sin(xn * two_pi);
+                    data[sample] = (1.0f - drive) * xn + yn * drive;
                 }
             }
         }

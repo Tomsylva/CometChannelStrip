@@ -30,6 +30,8 @@ namespace viator
         {
             sendChangeMessage();
         }
+
+        juce::Slider::mouseDown(event);
     }
 
     void BaseSlider::setIsMapped(const bool isMapped)
