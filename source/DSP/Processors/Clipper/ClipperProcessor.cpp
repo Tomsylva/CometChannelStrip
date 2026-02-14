@@ -33,11 +33,10 @@ namespace viator
             30.0f,
             0.0f));
 
-        const juce::StringArray choices = {"Soft", "Hard"};
-        params.push_back(std::make_unique<juce::AudioParameterChoice>(
+        params.push_back(std::make_unique<juce::AudioParameterBool>(
             juce::ParameterID{ClipperParameters::clipTypeID + juce::String(id), 1},
             ClipperParameters::clipTypeName + juce::String(id),
-            choices, 0));
+            true));
 
         const juce::StringArray os_choices = viator::globals::Oversampling::items;
         params.push_back(std::make_unique<juce::AudioParameterChoice>(
@@ -49,6 +48,19 @@ namespace viator
             juce::ParameterID{ClipperParameters::muteID + juce::String(id), 1},
             ClipperParameters::muteName + juce::String(id),
             false));
+
+        params.push_back(std::make_unique<juce::AudioParameterFloat>(
+            juce::ParameterID{ClipperParameters::inputGainID + juce::String(id), 1},
+            ClipperParameters::inputGainName + juce::String(id),
+            -30.0f,
+            30.0f,
+            0.0f));
+        params.push_back(std::make_unique<juce::AudioParameterFloat>(
+            juce::ParameterID{ClipperParameters::outputGainID + juce::String(id), 1},
+            ClipperParameters::outputGainName + juce::String(id),
+            -30.0f,
+            30.0f,
+            0.0f));
 
         return {params.begin(), params.end()};
     }
@@ -132,7 +144,7 @@ namespace viator
 
         const auto should_mute = m_parameters->muteParam->get();
 
-        for (auto& mute : m_mutes)
+        for (auto &mute: m_mutes)
         {
             mute.setTargetValue(!static_cast<float>(should_mute));
         }
@@ -145,7 +157,7 @@ namespace viator
         // initialisation that you need..
         juce::ignoreUnused(sampleRate, samplesPerBlock);
 
-        for (auto& mute : m_mutes)
+        for (auto &mute: m_mutes)
         {
             mute.reset(sampleRate, 0.02);
         }
@@ -212,8 +224,8 @@ namespace viator
 
         for (int channel = 0; channel < buffer.getNumChannels(); ++channel)
         {
-            auto* data = buffer.getWritePointer(channel);
-            const auto* dry_data = m_dry_buffer.getWritePointer(channel);
+            auto *data = buffer.getWritePointer(channel);
+            const auto *dry_data = m_dry_buffer.getWritePointer(channel);
 
             for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
             {

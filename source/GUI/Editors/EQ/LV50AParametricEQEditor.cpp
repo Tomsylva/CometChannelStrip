@@ -71,6 +71,11 @@ namespace viator
         m_drive_attach = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>
                 (processorRef.getTreeState(), LV50AParametricEQParameters::driveID + id, m_main_sliders[kDrive]);
 
+        m_low_bell_attach = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>
+                (processorRef.getTreeState(), LV50AParametricEQParameters::lowBellID + id, m_bell_buttons[kLowBell]);
+        m_high_bell_attach = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>
+        (processorRef.getTreeState(), LV50AParametricEQParameters::highBellID + id, m_bell_buttons[kHighBell]);
+
         for (int i = 0; i < LV50AParametricEQParameters::gainIDs.size(); ++i)
         {
             m_main_sliders[i].setComponentID(LV50AParametricEQParameters::gainIDs[i] + id);
@@ -83,6 +88,8 @@ namespace viator
 
         m_main_sliders[kDrive].setComponentID(LV50AParametricEQParameters::driveID + id);
         m_main_sliders[kDrive].setName("Drive");
+
+        setBellButtonProps();
     }
 
     LV50AParametricEQEditor::~LV50AParametricEQEditor()
@@ -90,6 +97,11 @@ namespace viator
         for (auto &slider: m_main_sliders)
         {
             slider.setLookAndFeel(nullptr);
+        }
+
+        for (auto &button: m_bell_buttons)
+        {
+            button.setLookAndFeel(nullptr);
         }
     }
 
@@ -101,7 +113,7 @@ namespace viator
 
         const auto text = "LV50 Parametric EQ";
         constexpr auto x = 0;
-        const auto y = juce::roundToInt(getHeight() * 0.045);
+        const auto y = juce::roundToInt(getHeight() * 0.59);
         const auto font_size = static_cast<float>(getHeight()) * 0.027f;
         g.setColour(juce::Colour(120, 185, 181));
         g.setFont(Fonts::bold(font_size));
@@ -118,12 +130,29 @@ namespace viator
         {
             y = juce::roundToInt(getHeight() * 0.12);
             m_main_sliders[i].setBounds(x, y, width, width);
-            y += width + width / 3;
+            y += width + width / 10;
             m_main_sliders[i + 8].setBounds(x, y, width, width);
-            y += width + width / 3;
+            y += width + width / 10;
             m_main_sliders[i + 4].setBounds(x, y, width, width);
             x += width;
         }
+
+        auto index = 4;
+        const auto button_width = juce::roundToInt(m_main_sliders[index].getWidth() * 0.66);
+        const auto button_height = button_width / 2;
+        const auto padding = button_height / 2;
+        auto button_x = m_main_sliders[index].getX() + juce::roundToInt(m_main_sliders[index].getWidth() * 0.17);
+        m_bell_buttons[kLowBell].setBounds(button_x,
+                                           m_main_sliders[index].getBottom() + padding,
+                                           button_width,
+                                           button_height);
+        index = 7;
+        button_x = m_main_sliders[index].getX() + juce::roundToInt(m_main_sliders[index].getWidth() * 0.17);
+        m_bell_buttons[kHighBell].setBounds(button_x,
+                                   m_main_sliders[index].getBottom() + padding,
+                                   button_width,
+                                   button_height);
+
 
         width = juce::roundToInt(getWidth() * 0.335);
         y = juce::roundToInt(getHeight() * 0.7);
@@ -160,5 +189,18 @@ namespace viator
         box.getLookAndFeel().setColour(juce::PopupMenu::ColourIds::backgroundColourId,
                                        viator::Colors::editor_minor_bg_color());
         addAndMakeVisible(box);
+    }
+
+    void LV50AParametricEQEditor::setBellButtonProps()
+    {
+        for (auto &button: m_bell_buttons)
+        {
+            button.setClickingTogglesState(true);
+            button.setButtonText("Bell");
+            button.setColour(juce::TextButton::ColourIds::textColourOnId, juce::Colours::whitesmoke);
+            button.setColour(juce::TextButton::ColourIds::textColourOffId, Colors::light_bg());
+            button.setLookAndFeel(&m_inset_toggle_laf);
+            addAndMakeVisible(button);
+        }
     }
 }

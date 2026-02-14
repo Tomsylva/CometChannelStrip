@@ -65,6 +65,21 @@ namespace viator
             {
                 filter.reset();
             }
+
+            for (auto& filter : m_dc_filters)
+            {
+                filter.reset();
+            }
+
+            for (auto& filter : m_ls_filters)
+            {
+                filter.reset();
+            }
+
+            for (auto& filter : m_lp_filters)
+            {
+                filter.reset();
+            }
         }
 
         void process(const juce::dsp::AudioBlock<float> &block)

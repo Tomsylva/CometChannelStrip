@@ -111,6 +111,11 @@ namespace viator
 
                 g.restoreState();
             }
+
+            g.setFont(Fonts::bold(static_cast<float>(button.getHeight()) * 0.56f));
+            g.setColour(isOn ? button.findColour(juce::TextButton::ColourIds::textColourOnId) : button.findColour(juce::TextButton::ColourIds::textColourOffId));
+            const auto& text = button.getButtonText();
+            g.drawFittedText(text, button.getLocalBounds(), juce::Justification::centred, 1);
         }
 
         void drawButtonText(juce::Graphics &g,

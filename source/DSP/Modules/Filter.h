@@ -24,6 +24,19 @@ namespace viator
             }
         }
 
+        void reset()
+        {
+            for (auto &filter: m_filters)
+            {
+                filter.reset();
+            }
+
+            for (auto &coeffs: m_coeffs)
+            {
+                coeffs.reset();
+            }
+        }
+
         void process(juce::dsp::AudioBlock<float> &block)
         {
             m_filter_duplicator.process(juce::dsp::ProcessContextReplacing<float>{block});

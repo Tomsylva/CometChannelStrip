@@ -67,13 +67,35 @@ namespace viator
                 juce::ParameterID{LV50AParametricEQParameters::qIDs[static_cast<size_t>(i)] + juce::String(id), 1},
                 "Q " + juce::String(i + 1) + juce::String(id),
                 0.01f, 0.95f, 0.3f));
-
-
-            params.push_back(std::make_unique<juce::AudioParameterFloat>(
-                juce::ParameterID{LV50AParametricEQParameters::cutoffIDs[static_cast<size_t>(i)] + juce::String(id), 1},
-                "Cutoff " + juce::String(i + 1) + juce::String(id),
-                range, 1000.0f));
         }
+
+        range = juce::NormalisableRange<float>(40.0f, 400.0f, 1.0f);
+        range.setSkewForCentre(150.0f);
+        params.push_back(std::make_unique<juce::AudioParameterFloat>(
+            juce::ParameterID{LV50AParametricEQParameters::cutoffIDs[static_cast<size_t>(0)] + juce::String(id), 1},
+            "Cutoff " + juce::String(1) + juce::String(id),
+            range, 150.0f));
+
+        range = juce::NormalisableRange<float>(75.0f, 1000.0f, 1.0f);
+        range.setSkewForCentre(300.0f);
+        params.push_back(std::make_unique<juce::AudioParameterFloat>(
+            juce::ParameterID{LV50AParametricEQParameters::cutoffIDs[static_cast<size_t>(1)] + juce::String(id), 1},
+            "Cutoff " + juce::String(2) + juce::String(id),
+            range, 300.0f));
+
+        range = juce::NormalisableRange<float>(800.0f, 12000.0f, 1.0f);
+        range.setSkewForCentre(6000.0f);
+        params.push_back(std::make_unique<juce::AudioParameterFloat>(
+            juce::ParameterID{LV50AParametricEQParameters::cutoffIDs[static_cast<size_t>(2)] + juce::String(id), 1},
+            "Cutoff " + juce::String(3) + juce::String(id),
+            range, 6000.0f));
+
+        range = juce::NormalisableRange<float>(2000.0f, 20000.0f, 1.0f);
+        range.setSkewForCentre(10000.0f);
+        params.push_back(std::make_unique<juce::AudioParameterFloat>(
+            juce::ParameterID{LV50AParametricEQParameters::cutoffIDs[static_cast<size_t>(3)] + juce::String(id), 1},
+            "Cutoff " + juce::String(4) + juce::String(id),
+            range, 10000.0f));
 
         params.push_back(std::make_unique<juce::AudioParameterFloat>(
             juce::ParameterID{LV50AParametricEQParameters::inputGainID + juce::String(id), 1},
@@ -87,6 +109,16 @@ namespace viator
             -30.0f,
             30.0f,
             0.0f));
+
+        params.push_back(std::make_unique<juce::AudioParameterBool>(
+            juce::ParameterID{LV50AParametricEQParameters::lowBellID + juce::String(id), 1},
+            LV50AParametricEQParameters::lowBellName + juce::String(id),
+            false));
+
+        params.push_back(std::make_unique<juce::AudioParameterBool>(
+            juce::ParameterID{LV50AParametricEQParameters::highBellID + juce::String(id), 1},
+            LV50AParametricEQParameters::highBellName + juce::String(id),
+            false));
 
         return {params.begin(), params.end()};
     }

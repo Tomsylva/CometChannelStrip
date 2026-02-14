@@ -19,6 +19,11 @@ namespace ClipperParameters
     inline const juce::String clipTypeID = "clipTypeID";
     inline const juce::String clipTypeName = "Type";
 
+    inline const juce::String inputGainID = "inputGainID";
+    inline const juce::String inputGainName = "Input";
+    inline const juce::String outputGainID = "outputGainID";
+    inline const juce::String outputGainName = "Output";
+
     struct parameters {
         explicit parameters(const juce::AudioProcessorValueTreeState &state, int id)
         {
@@ -26,16 +31,24 @@ namespace ClipperParameters
                 oversamplingChoiceID + juce::String(id)));
             driveParam = dynamic_cast<juce::AudioParameterFloat *>(state.getParameter(
                 driveID + juce::String(id)));
-            typeParam = dynamic_cast<juce::AudioParameterChoice *>(state.getParameter(
+            typeParam = dynamic_cast<juce::AudioParameterBool *>(state.getParameter(
                 clipTypeID + juce::String(id)));
             muteParam = dynamic_cast<juce::AudioParameterBool *>(state.getParameter(
                 muteID + juce::String(id)));
+
+            inputParam = dynamic_cast<juce::AudioParameterFloat *>(state.getParameter(
+                inputGainID + juce::String(id)));
+            outputParam = dynamic_cast<juce::AudioParameterFloat *>(state.getParameter(
+                outputGainID + juce::String(id)));
         }
 
         juce::AudioParameterChoice *oversamplingParam{nullptr};
         juce::AudioParameterFloat *driveParam{nullptr};
-        juce::AudioParameterChoice *typeParam{nullptr};
+        juce::AudioParameterBool *typeParam{nullptr};
         juce::AudioParameterBool *muteParam{nullptr};
+
+        juce::AudioParameterFloat *inputParam{nullptr};
+        juce::AudioParameterFloat *outputParam{nullptr};
     };
 }
 
@@ -81,13 +94,12 @@ namespace viator
         {
             juce::dsp::AudioBlock<float> block(buffer);
             const auto up_sampled_block = m_oversampler->processSamplesUp(block);
-            switch (m_current_type)
-            {
-                case DistortionType::kSoftClip: softClip(up_sampled_block, buffer.getNumSamples());
-                    break;
-                case DistortionType::kHardClip: hardClip(up_sampled_block, buffer.getNumSamples());
-                    break;
-            }
+
+            if (m_is_soft)
+                softClip(up_sampled_block, buffer.getNumSamples());
+            else
+                hardClip(up_sampled_block, buffer.getNumSamples());
+
             m_oversampler->processSamplesDown(block);
         }
 
@@ -112,15 +124,14 @@ namespace viator
                 }
             }
 
-            const auto type = parameters.typeParam->getIndex();
-            m_current_type = static_cast<DistortionType>(type);
+            m_is_soft = parameters.typeParam->get();
         }
 
     private:
         std::unique_ptr<juce::dsp::Oversampling<float> > m_oversampler;
         std::array<juce::SmoothedValue<float>, 2> m_drive_smoothers, m_drive_comp_smoothers;
         static constexpr float m_two_by_pi = 2.0f / juce::MathConstants<float>::pi;
-        DistortionType m_current_type = DistortionType::kSoftClip;
+        bool m_is_soft {true};
         int m_should_compensate{true};
 
         void softClip(const juce::dsp::AudioBlock<float> &block, const int num_samples)
@@ -130,10 +141,9 @@ namespace viator
                 auto *data = block.getChannelPointer(channel);
                 for (size_t sample = 0; sample < num_samples; ++sample)
                 {
-                    const auto drive_comp = m_drive_comp_smoothers[channel].getNextValue();
                     const float xn = data[sample] * m_drive_smoothers[channel].getNextValue();
-                    const float yn = m_two_by_pi * std::atan(xn) * 2.0f;
-                    data[sample] = yn * drive_comp;
+                    const float yn = std::tanh(xn);
+                    data[sample] = yn;
                 }
             }
         }
@@ -145,10 +155,9 @@ namespace viator
                 auto *data = block.getChannelPointer(channel);
                 for (size_t sample = 0; sample < num_samples; ++sample)
                 {
-                    const auto drive_comp = m_drive_comp_smoothers[channel].getNextValue();
                     const float xn = data[sample] * m_drive_smoothers[channel].getNextValue();
                     const float yn = std::clamp(xn, -1.0f, 1.0f);
-                    data[sample] = yn * drive_comp;
+                    data[sample] = yn;
                 }
             }
         }

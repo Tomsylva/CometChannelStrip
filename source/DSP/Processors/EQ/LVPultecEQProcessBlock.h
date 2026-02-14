@@ -136,7 +136,16 @@ namespace viator
     public:
         LVPultecEQProcessBlock() = default;
 
-        ~LVPultecEQProcessBlock() = default;
+        ~LVPultecEQProcessBlock()
+        {
+            for (auto &tube: m_tubes) {
+                tube.reset();
+            }
+
+            for (auto &filter: m_filters) {
+                filter.reset();
+            }
+        }
 
         enum
         {

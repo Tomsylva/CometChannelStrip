@@ -28,6 +28,12 @@ namespace LV50AParametricEQParameters
     inline const juce::String driveID = "driveID";
     inline const juce::String driveName = "Drive";
 
+    inline const juce::String lowBellID = "lowBellID";
+    inline const juce::String lowBellName = "Low Bell";
+
+    inline const juce::String highBellID = "highBellID";
+    inline const juce::String highBellName = "High Bell";
+
     constexpr int numBands = 4;
 
     inline const std::array<juce::String, numBands> gainIDs = {
@@ -66,6 +72,12 @@ namespace LV50AParametricEQParameters
             muteParam = dynamic_cast<juce::AudioParameterBool *>(state.getParameter(
                 muteID + juce::String(id)));
 
+            lowBellParam = dynamic_cast<juce::AudioParameterBool *>(state.getParameter(
+                lowBellID + juce::String(id)));
+
+            highBellParam = dynamic_cast<juce::AudioParameterBool *>(state.getParameter(
+                highBellID + juce::String(id)));
+
             for (int i = 0; i < numBands; ++i) {
                 gainParams[i] = dynamic_cast<juce::AudioParameterFloat *>(state.getParameter(
                     gainIDs[static_cast<size_t>(i)] + juce::String(id)));
@@ -83,6 +95,9 @@ namespace LV50AParametricEQParameters
         juce::AudioParameterBool *muteParam{nullptr};
         juce::AudioParameterFloat *inputParam{nullptr};
         juce::AudioParameterFloat *outputParam{nullptr};
+
+        juce::AudioParameterBool *lowBellParam{nullptr};
+        juce::AudioParameterBool *highBellParam{nullptr};
 
         std::array<juce::AudioParameterFloat *, numBands> gainParams{};
         std::array<juce::AudioParameterFloat *, numBands> qParams{};
@@ -168,6 +183,11 @@ namespace viator
 
             m_filters[kHP].setCutoffFrequency(hp_cutoff);
             m_filters[kLP].setCutoffFrequency(lp_cutoff);
+
+            const auto low_bell = parameters.lowBellParam->get();
+            const auto high_bell = parameters.highBellParam->get();
+            m_eq.setLowBell(low_bell);
+            m_eq.setHighBell(high_bell);
         }
 
     private:
