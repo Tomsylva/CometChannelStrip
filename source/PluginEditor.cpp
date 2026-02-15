@@ -74,9 +74,11 @@ void AudioPluginAudioProcessorEditor::paint(juce::Graphics &g)
     g.setGradientFill(faceGrad);
     g.fillRect(bounds);
 
+    g.drawImageAt(m_images.getNoiseImage(), 0, 0);
+
     // header
     auto line = static_cast<float>(getHeight()) * 0.08f;
-    g.setColour(viator::Colors::light_bg());
+    g.setColour(viator::Colors::widget_on());
     g.drawLine(0, line, static_cast<float>(getWidth()), line, 1.0f);
 
     // footer
@@ -88,6 +90,9 @@ void AudioPluginAudioProcessorEditor::paint(juce::Graphics &g)
 
 void AudioPluginAudioProcessorEditor::resized()
 {
+    if (getWidth() > 0 && getHeight() > 0)
+        m_images.getNoiseImage() = viator::Images::makeNoiseImage(getWidth(), getHeight(), 0.02f);
+
     // SIZE MENU
     auto padding = juce::roundToInt(getHeight() * 0.01);
     const auto width = juce::roundToInt(getWidth() * 0.1);

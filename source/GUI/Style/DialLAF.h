@@ -16,15 +16,16 @@ namespace viator
         {
             const auto bounds = slider.getLocalBounds().toFloat().reduced(static_cast<float>(slider.getWidth()) * 0.1f);
             const auto center = bounds.getCentre();
-            const float radius = juce::jmin(bounds.getWidth(), bounds.getHeight()) / 2.0f - 10.0f;
+            const auto r_padding = static_cast<float>(slider.getParentHeight()) * 0.019f;
+            const float radius = juce::jmin(bounds.getWidth(), bounds.getHeight()) / 2.0f - r_padding;
 
             constexpr int numSteps = 11;
             constexpr float startAngle = juce::MathConstants<float>::pi * 1.25f;
             constexpr float endAngle = juce::MathConstants<float>::pi * 2.75f;
 
             g.setColour(Colors::text());
-            constexpr auto font_size = 10.0f;
-            const auto font = Fonts::bold(font_size);
+            const auto font_size = static_cast<float>(slider.getParentHeight()) * 0.017f;
+            const auto font = Fonts::regular(font_size);
             g.setFont(font);
 
             if (slider.getName() != "Type") {
@@ -50,7 +51,7 @@ namespace viator
                     const auto textWidth = static_cast<float>(slider.getWidth());
                     const float textHeight = g.getCurrentFont().getAscent();
 
-                    if (i == 0 || i == 5 || i == 10) {
+                    if (i == 0 || i == 10) {
                         const juce::Rectangle<float> textBounds(x - textWidth / 2.0f, y - textHeight / 2.0f, textWidth,
                                                                 textHeight);
                         g.drawText(label, textBounds, juce::Justification::centred);
@@ -208,16 +209,19 @@ namespace viator
                 g.fillEllipse(dotBounds);
             }
 
-            constexpr auto font_size = 10.0f;
-            const auto font = Fonts::bold(font_size);
+            auto font_size = static_cast<float>(slider.getParentHeight()) * 0.023f;
+            auto font = Fonts::bold(font_size);
             const auto suffix = slider.getTextValueSuffix();
             const auto value = slider.getValue();
+            const auto text = formatKnobValue(value, suffix) + suffix;
+            g.setColour(Colors::text());
+            g.setFont(font);
 
-            const auto text = slider.isMouseOverOrDragging()
-                                  ? formatKnobValue(value, suffix) + suffix
-                                  : slider.getName();
+            g.drawText(slider.getName(), 0, 0, width, juce::roundToInt(font_size),
+                       juce::Justification::centredBottom);
 
-            g.setColour(juce::Colour(255, 255, 255));
+            font_size = static_cast<float>(slider.getParentHeight()) * 0.019f;
+            font = Fonts::regular(font_size);
             g.setFont(font);
             g.drawText(text, 0, height - juce::roundToInt(font_size), width, juce::roundToInt(font_size),
                        juce::Justification::centredBottom);

@@ -43,9 +43,13 @@ namespace viator
             main_slider_attaches.emplace_back(std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>
                 (processorRef.getTreeState(), LV50AParametricEQParameters::cutoffIDs[i] + id, m_main_sliders[i + 8]));
 
-            m_main_sliders[i].setName("Gain " + juce::String(i + 1));
-            m_main_sliders[i + 4].setName("Q " + juce::String(i + 1));
-            m_main_sliders[i + 8].setName("Cutoff " + juce::String(i + 1));
+            m_main_sliders[i].setName("Gain");
+            m_main_sliders[i + 4].setName("BW");
+            m_main_sliders[i + 8].setName("Cutoff");
+
+            m_main_sliders[i].setTextValueSuffix(" dB");
+            m_main_sliders[i + 4].setTextValueSuffix(" Q");
+            m_main_sliders[i + 8].setTextValueSuffix(" Hz");
 
             m_main_sliders[i].setComponentID(LV50AParametricEQParameters::gainIDs[i] + id);
             m_main_sliders[i + 4].setComponentID(LV50AParametricEQParameters::qIDs[i] + id);
